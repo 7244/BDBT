@@ -13,7 +13,7 @@
     #define _BDBT_fcall(name, ...) name(_BDBT_this, ##__VA_ARGS__)
   #elif defined(BDBT_set_lcpp)
     #define _BDBT_this this
-    #define _BDBT_fdec(rtype, name, ...) static rtype name(__VA_ARGS__)
+    #define _BDBT_fdec(rtype, name, ...) rtype name(__VA_ARGS__)
     #define _BDBT_fcall(name, ...) name(__VA_ARGS__)
   #else
     #error ?

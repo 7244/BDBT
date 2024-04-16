@@ -74,10 +74,10 @@ BDBT_StructBegin(_BDBT_P(t))
 
   #ifdef BDBT_set_CPP_ConstructDestruct
     _BDBT_P(t)(){
-      _BDBT_P(Open)();
+      _BDBT_fcall(Open);
     }
     ~_BDBT_P(t)(){
-      _BDBT_P(Close)();
+      _BDBT_fcall(Close);
     }
   #endif
 

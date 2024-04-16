@@ -106,10 +106,10 @@
 #endif
 
 #if BDBT_set_declare_rest == 1
-  #include _BDBT_INCLUDE(BDBT/internal/rest.h)
+  #include "internal/rest.h"
 #endif
 #if BDBT_set_declare_Key == 1
-  #include _BDBT_INCLUDE(BDBT/internal/Key/Key.h)
+  #include "internal/Key/Key.h"
 #endif
 
 #undef BDBT_StructBegin

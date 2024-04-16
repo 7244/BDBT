@@ -27,12 +27,6 @@ BDBT_StructEnd(_BDBT_P(Node_t))
 #define BVEC_set_NodeData _BDBT_P(Node_t)
 #include _BDBT_INCLUDE(BVEC/BVEC.h)
 
-#ifdef BDBT_set_CPP_ConstructDestruct
-  struct _BDBT_P(t);
-  static void _BDBT_P(Open)(_BDBT_P(t) *list);
-  static void _BDBT_P(Close)(_BDBT_P(t) *list);
-#endif
-
 BDBT_StructBegin(_BDBT_P(t))
   #if BDBT_set_StoreFormat == 0
     _BDBT_P(_NodeList_t) NodeList;
@@ -42,15 +36,54 @@ BDBT_StructBegin(_BDBT_P(t))
     _BDBT_P(NodeReference_t) p;
   }e;
 
+#ifdef BDBT_set_lc
+  BDBT_StructEnd(_BDBT_P(t))
+#endif
+
+  _BDBT_fdec(void, _AfterInitNodes)
+  {
+    _BDBT_this->e.p = 0;
+  }
+
+  _BDBT_fdec(void, Open)
+  {
+    #if BDBT_set_UseUninitialisedValues == 0
+      _BDBT_this->e.c = 0;
+    #endif
+
+    _BDBT_P(_NodeList_Open)(&_BDBT_this->NodeList);
+    _BDBT_fcall(_AfterInitNodes);
+  }
+  _BDBT_fdec(void, Close)
+  {
+    _BDBT_P(_NodeList_Close)(&_BDBT_this->NodeList);
+  }
+  _BDBT_fdec(void, Clear)
+  {
+    #if BDBT_set_ResizeListAfterClear
+      #if BDBT_set_BaseLibrary == 0
+        _BDBT_this->nodes.Possible = 2;
+        _BDBT_this->nodes.ptr = _BDBT_this->nodes.resize(
+          _BDBT_this->nodes.ptr, _BDBT_this->nodes.Possible * _BDBT_this->nodes.Type);
+      #elif BDBT_set_BaseLibrary == 1
+        _BDBT_this->nodes.resize(0);
+      #endif
+    #endif
+    _BDBT_fcall(_AfterInitNodes);
+  }
+
   #ifdef BDBT_set_CPP_ConstructDestruct
     _BDBT_P(t)(){
-      _BDBT_P(Open)(this);
+      _BDBT_P(Open)();
     }
     ~_BDBT_P(t)(){
-      _BDBT_P(Close)(this);
+      _BDBT_P(Close)();
     }
   #endif
-BDBT_StructEnd(_BDBT_P(t))
+
+#ifdef BDBT_set_lcpp
+  BDBT_StructEnd(_BDBT_P(t))
+#endif
 
 /* is node reference invalid */
 static
@@ -222,53 +255,6 @@ _BDBT_P(NewNodeBranchly)
   }
 
   return NodeReference;
-}
-
-static
-void
-_BDBT_P(_AfterInitNodes)
-(
-  _BDBT_P(t) *list
-){
-  list->e.p = 0;
-}
-
-static
-void
-_BDBT_P(Open)
-(
-  _BDBT_P(t) *list
-){
-  #if BDBT_set_UseUninitialisedValues == 0
-    list->e.c = 0;
-  #endif
-
-  _BDBT_P(_NodeList_Open)(&list->NodeList);
-  _BDBT_P(_AfterInitNodes)(list);
-}
-static
-void
-_BDBT_P(Close)
-(
-  _BDBT_P(t) *list
-){
-  _BDBT_P(_NodeList_Close)(&list->NodeList);
-}
-static
-void
-_BDBT_P(Clear)
-(
-  _BDBT_P(t) *list
-){
-  #if BDBT_set_ResizeListAfterClear
-    #if BDBT_set_BaseLibrary == 0
-      list->nodes.Possible = 2;
-      list->nodes.ptr = list->nodes.resize(list->nodes.ptr, list->nodes.Possible * list->nodes.Type);
-    #elif BDBT_set_BaseLibrary == 1
-      list->nodes.resize(0);
-    #endif
-  #endif
-  _BDBT_P(_AfterInitNodes)(list);
 }
 
 static

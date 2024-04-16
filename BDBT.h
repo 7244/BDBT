@@ -97,23 +97,7 @@
 #endif
 #define _BDBT_P(p0) CONCAT3(BDBT_set_prefix, _, p0)
 
-#if BDBT_set_StructFormat == 0
-  #define BDBT_StructBegin(n) typedef struct{
-  #define BDBT_StructEnd(n) }n;
-#elif BDBT_set_StructFormat == 1
-  #define BDBT_StructBegin(n) struct n{
-  #define BDBT_StructEnd(n) };
-#endif
-
-#if BDBT_set_declare_rest == 1
-  #include "internal/rest.h"
-#endif
-#if BDBT_set_declare_Key == 1
-  #include "internal/Key/Key.h"
-#endif
-
-#undef BDBT_StructBegin
-#undef BDBT_StructEnd
+#include "internal/PrepareAndInclude.h"
 
 #undef _BDBT_P
 #undef _BDBT_BP

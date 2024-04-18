@@ -66,6 +66,9 @@
 #ifndef BDBT_set_type_node
   #define BDBT_set_type_node uint32_t
 #endif
+#ifndef BDBT_set_UseZeroAsInvalid
+  #define BDBT_set_UseZeroAsInvalid 0
+#endif
 #ifndef BDBT_set_BitPerNode
   #define BDBT_set_BitPerNode 2
 #endif
@@ -112,6 +115,7 @@
 #undef BDBT_set_prefix
 #undef BDBT_set_declare_Key
 #undef BDBT_set_declare_rest
+#undef BDBT_set_UseZeroAsInvalid
 #undef BDBT_set_type_node
 #undef BDBT_set_PadNode
 #undef BDBT_set_debug_InvalidAction

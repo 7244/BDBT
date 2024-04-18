@@ -43,6 +43,10 @@ BDBT_StructBegin(_BDBT_P(t))
   _BDBT_fdec(void, _AfterInitNodes)
   {
     _BDBT_this->e.p = 0;
+    #if BDBT_set_UseZeroAsInvalid == 1
+      /* reserved */
+      _BDBT_P(_NodeList_AddEmpty)(&_BDBT_this->NodeList, 1);
+    #endif
   }
 
   _BDBT_fdec(void, Open)
@@ -60,15 +64,12 @@ BDBT_StructBegin(_BDBT_P(t))
   }
   _BDBT_fdec(void, Clear)
   {
-    #if BDBT_set_ResizeListAfterClear
-      #if BDBT_set_BaseLibrary == 0
-        _BDBT_this->nodes.Possible = 2;
-        _BDBT_this->nodes.ptr = _BDBT_this->nodes.resize(
-          _BDBT_this->nodes.ptr, _BDBT_this->nodes.Possible * _BDBT_this->nodes.Type);
-      #elif BDBT_set_BaseLibrary == 1
-        _BDBT_this->nodes.resize(0);
-      #endif
+    #if BDBT_set_ResizeListAfterClear == 1
+      /* TODO implement this */
+    #else
+      _BDBT_P(_NodeList_Clear)(&_BDBT_this->NodeList);
     #endif
+
     _BDBT_fcall(_AfterInitNodes);
   }
 
@@ -96,6 +97,22 @@ _BDBT_P(inri)
   return NodeReference >= list->NodeList.Current;
 }
 
+/* get node reference invalid constant */
+static
+_BDBT_P(NodeReference_t)
+_BDBT_P(gnric)
+(
+  _BDBT_P(t) *list
+){
+  return (_BDBT_P(NodeReference_t))
+    #if BDBT_set_UseZeroAsInvalid == 0
+      -1
+    #else
+      0
+    #endif
+  ;
+}
+
 /* is node reference invalid constant */
 static
 bool
@@ -104,17 +121,7 @@ _BDBT_P(inric)
   _BDBT_P(t) *list,
   _BDBT_P(NodeReference_t) NodeReference
 ){
-  return NodeReference == (_BDBT_P(NodeReference_t))-1;
-}
-
-/* get node reference invalid constant */
-static
-_BDBT_P(NodeReference_t)
-_BDBT_P(gnric)
-(
-  _BDBT_P(t) *list
-){
-  return (_BDBT_P(NodeReference_t))-1;
+  return NodeReference == _BDBT_P(gnric)(list);
 }
 
 #if BDBT_set_IsNodeUnlinked == 1
@@ -125,7 +132,7 @@ _BDBT_P(gnric)
     _BDBT_P(t) *list,
     _BDBT_P(Node_t) *Node
   ){
-    if(Node->n[1] == (_BDBT_P(NodeReference_t))-1){
+    if(Node->n[1] == _BDBT_P(gnric)(list)){
       return 1;
     }
     return 0;
@@ -268,7 +275,7 @@ _BDBT_P(Recycle)
 
   Node->n[0] = list->e.c;
   #if BDBT_set_IsNodeUnlinked == 1
-    Node->n[1] = _BDBT_P(NodeReference_t)-1;
+    Node->n[1] = _BDBT_P(gnric)(list);
   #endif
   list->e.c = NodeReference;
   list->e.p++;

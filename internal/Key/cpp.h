@@ -7,6 +7,11 @@ struct _BDBT_P(Key_t){
     constexpr static bool BitOrderMatters = true;
   #endif
 
+  typedef uint8_t BitOrder_t;
+  constexpr static BitOrder_t BitOrderLow = 0; /* low to high*/
+  constexpr static BitOrder_t BitOrderHigh = 1; /* high to low */
+  constexpr static BitOrder_t BitOrderAny = 2; /* does not matter */
+
   #if !defined(BDBT_set_KeySize)
     #define _BDBT_ksizeConstexpr constexpr
 
@@ -39,7 +44,7 @@ struct _BDBT_P(Key_t){
     >
   >KeyNodeIterator_t;
 
-  uint8_t ReverseKeyByte(uint8_t p){
+  static uint8_t ReverseKeyByte(uint8_t p){
     #if BDBT_set_BitPerNode == 1
       return bitswap8(p);
     #elif BDBT_set_BitPerNode == 2
@@ -57,6 +62,7 @@ struct _BDBT_P(Key_t){
   }
 
   /* add */
+  static
   void
   a
   (
@@ -73,6 +79,7 @@ struct _BDBT_P(Key_t){
   }
 
   /* query */
+  static
   void
   q
   (
@@ -87,6 +94,7 @@ struct _BDBT_P(Key_t){
     #include "cpp/q.h"
   }
 
+  static
   KeySize_t
   _r
   (
@@ -99,6 +107,7 @@ struct _BDBT_P(Key_t){
   ){
     #include "cpp/r.h"
   }
+  static
   void
   r
   (
@@ -119,6 +128,7 @@ struct _BDBT_P(Key_t){
     );
   }
   /* remove with info */
+  static
   KeySize_t
   rwi
   (
@@ -140,6 +150,7 @@ struct _BDBT_P(Key_t){
   }
 
   /* confident query */
+  static
   void
   cq
   (
@@ -171,7 +182,7 @@ struct _BDBT_P(Key_t){
     _BDBT_BP(NodeReference_t) Output;
 
     /* init */
-    template <uint8_t LowHigh = 2>
+    template <BitOrder_t BitOrder = BitOrderAny>
     void
     i
     (
@@ -181,7 +192,7 @@ struct _BDBT_P(Key_t){
       _BDBT_BP(NodeReference_t) rnr
     ){
       Current = 0;
-      ta[0].k = LowHigh == 1 ? _BDBT_set_ElementPerNode - 1 : 0;
+      ta[0].k = BitOrder == BitOrderHigh ? _BDBT_set_ElementPerNode - 1 : 0;
       ta[0].n = rnr;
     }
     void
@@ -191,18 +202,18 @@ struct _BDBT_P(Key_t){
         ta_t *ta,
       #endif
       _BDBT_BP(NodeReference_t) rnr,
-      uint8_t LowHigh = 2
+      BitOrder_t BitOrder = BitOrderAny
     ){
-      if(LowHigh == 0){
-        i<0>(
+      if(BitOrder == BitOrderLow){
+        i<BitOrderLow>(
           #if defined(BDBT_set_KeySize)
             ta,
           #endif
           rnr
         );
       }
-      else if(LowHigh == 1){
-        i<1>(
+      else if(BitOrder == BitOrderHigh){
+        i<BitOrderHigh>(
           #if defined(BDBT_set_KeySize)
             ta,
           #endif
@@ -220,7 +231,7 @@ struct _BDBT_P(Key_t){
     }
 
     /* traverse */
-    template <uint8_t LowHigh = 2>
+    template <BitOrder_t BitOrder = BitOrderAny>
     bool
     t
     (
@@ -242,9 +253,9 @@ struct _BDBT_P(Key_t){
         KeySize_t KeySize,
       #endif
       void *Key,
-      uint8_t LowHigh = 2
+      BitOrder_t BitOrder = BitOrderAny
     ){
-      if(LowHigh == 0){
+      if(BitOrder == BitOrderLow){
         return t<0>(
           list,
           #if defined(BDBT_set_KeySize)
@@ -254,7 +265,7 @@ struct _BDBT_P(Key_t){
           Key
         );
       }
-      else if(LowHigh == 1){
+      else if(BitOrder == BitOrderHigh){
         return t<1>(
           list,
           #if defined(BDBT_set_KeySize)

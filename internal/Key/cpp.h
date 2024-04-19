@@ -1,10 +1,11 @@
-template <
-  #if !defined(BDBT_set_KeySize)
-    uintptr_t _KeySize,
-  #endif
-  bool BitOrderMatters = false
->
+#if !defined(BDBT_set_KeySize)
+  template <uintptr_t _KeySize, bool BitOrderMatters = false>
+#endif
 struct _BDBT_P(Key_t){
+  #if defined(BDBT_set_KeySize)
+    /* TODO user need to spectify it in runtime. */
+    constexpr static bool BitOrderMatters = true;
+  #endif
 
   #if !defined(BDBT_set_KeySize)
     #define _BDBT_ksizeConstexpr constexpr
@@ -136,6 +137,20 @@ struct _BDBT_P(Key_t){
       Key,
       cnr
     );
+  }
+
+  /* confident query */
+  void
+  cq
+  (
+    _BDBT_BP(t) *list,
+    #if defined(BDBT_set_KeySize)
+      KeySize_t KeySize,
+    #endif
+    const void *Key,
+    _BDBT_BP(NodeReference_t) *cnr
+  ){
+    #include "cpp/cq.h"
   }
 
   /* give 0 if you want to sort from low, 1 for high. */

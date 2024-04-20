@@ -105,6 +105,10 @@
 #undef _BDBT_P
 #undef _BDBT_BP
 
+#ifdef BDBT_set_base_prefix
+  #undef BDBT_set_base_prefix
+#endif
+
 #undef _BDBT_INCLUDE
 
 #ifdef BDBT_set_MaxKeySize

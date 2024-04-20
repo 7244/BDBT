@@ -107,6 +107,9 @@
 
 #undef _BDBT_INCLUDE
 
+#ifdef BDBT_set_MaxKeySize
+  #undef BDBT_set_MaxKeySize
+#endif
 #undef _BDBT_set_ElementPerNode
 #undef BDBT_set_BitPerNode
 #ifdef BDBT_set_CPP_ConstructDestruct

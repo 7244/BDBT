@@ -8,13 +8,11 @@ struct _BDBT_P(Key_t){
   #endif
 
   typedef uint8_t BitOrder_t;
-  constexpr static BitOrder_t BitOrderLow = 0; /* low to high*/
+  constexpr static BitOrder_t BitOrderLow = 0; /* low to high */
   constexpr static BitOrder_t BitOrderHigh = 1; /* high to low */
   constexpr static BitOrder_t BitOrderAny = 2; /* does not matter */
 
   #if !defined(BDBT_set_KeySize)
-    #define _BDBT_ksizeConstexpr constexpr
-
     typedef std::conditional_t<
       _KeySize <= 0xff,
       uint8_t,
@@ -23,12 +21,32 @@ struct _BDBT_P(Key_t){
         uint32_t
       >
     >KeySize_t;
+  #elif defined(BDBT_set_MaxKeySize)
+    #if BDBT_set_MaxKeySize <= 0xff
+      typedef uint8_t KeySize_t;
+    #elif BDBT_set_MaxKeySize <= 0xffff
+      typedef uint16_t KeySize_t;
+    #elif BDBT_set_MaxKeySize <= 0xffffffff
+      typedef uint32_t KeySize_t;
+    #else
+      #error ?
+    #endif
+  #else
+    typedef uintptr_t KeySize_t;
+  #endif
+
+  #if !defined(BDBT_set_KeySize)
+    constexpr static KeySize_t MaxKeySize = _KeySize;
+  #elif defined(BDBT_set_MaxKeySize)
+    constexpr static KeySize_t MaxKeySize = BDBT_set_MaxKeySize;
+  #endif
+
+  #if !defined(BDBT_set_KeySize)
+    #define _BDBT_ksizeConstexpr constexpr
 
     #define KeySize (KeySize_t)_KeySize
   #else
     #define _BDBT_ksizeConstexpr
-
-    typedef uintptr_t KeySize_t;
 
     #define KeySize KeySize
   #endif
@@ -171,8 +189,8 @@ struct _BDBT_P(Key_t){
       _BDBT_BP(NodeReference_t) n;
       KeyNodeIterator_t k;
     };
-    #ifndef BDBT_set_KeySize
-      ta_t ta[KeySize / BDBT_set_BitPerNode];
+    #if !defined(BDBT_set_KeySize) || defined(BDBT_set_MaxKeySize)
+      ta_t ta[MaxKeySize / BDBT_set_BitPerNode];
     #else
       static uintptr_t GetTraverseArraySize(KeySize_t KeySize){
         return KeySize / BDBT_set_BitPerNode;
@@ -186,7 +204,7 @@ struct _BDBT_P(Key_t){
     void
     i
     (
-      #if defined(BDBT_set_KeySize)
+      #if defined(BDBT_set_KeySize) && !defined(BDBT_set_MaxKeySize)
         ta_t *ta,
       #endif
       _BDBT_BP(NodeReference_t) rnr
@@ -198,7 +216,7 @@ struct _BDBT_P(Key_t){
     void
     i0
     (
-      #if defined(BDBT_set_KeySize)
+      #if defined(BDBT_set_KeySize) && !defined(BDBT_set_MaxKeySize)
         ta_t *ta,
       #endif
       _BDBT_BP(NodeReference_t) rnr,
@@ -206,7 +224,7 @@ struct _BDBT_P(Key_t){
     ){
       if(BitOrder == BitOrderLow){
         i<BitOrderLow>(
-          #if defined(BDBT_set_KeySize)
+          #if defined(BDBT_set_KeySize) && !defined(BDBT_set_MaxKeySize)
             ta,
           #endif
           rnr
@@ -214,7 +232,7 @@ struct _BDBT_P(Key_t){
       }
       else if(BitOrder == BitOrderHigh){
         i<BitOrderHigh>(
-          #if defined(BDBT_set_KeySize)
+          #if defined(BDBT_set_KeySize) && !defined(BDBT_set_MaxKeySize)
             ta,
           #endif
           rnr
@@ -222,7 +240,7 @@ struct _BDBT_P(Key_t){
       }
       else{
         i<>(
-          #if defined(BDBT_set_KeySize)
+          #if defined(BDBT_set_KeySize) && !defined(BDBT_set_MaxKeySize)
             ta,
           #endif
           rnr
@@ -237,7 +255,9 @@ struct _BDBT_P(Key_t){
     (
       _BDBT_BP(t) *list,
       #if defined(BDBT_set_KeySize)
-        ta_t *ta,
+        #if !defined(BDBT_set_MaxKeySize)
+          ta_t *ta,
+        #endif
         KeySize_t KeySize,
       #endif
       void *Key
@@ -249,7 +269,9 @@ struct _BDBT_P(Key_t){
     t0(
       _BDBT_BP(t) *list,
       #if defined(BDBT_set_KeySize)
-        ta_t *ta,
+        #if !defined(BDBT_set_MaxKeySize)
+          ta_t *ta,
+        #endif
         KeySize_t KeySize,
       #endif
       void *Key,
@@ -259,7 +281,9 @@ struct _BDBT_P(Key_t){
         return t<0>(
           list,
           #if defined(BDBT_set_KeySize)
-            ta,
+            #if !defined(BDBT_set_MaxKeySize)
+              ta_t *ta,
+            #endif
             KeySize,
           #endif
           Key
@@ -269,7 +293,9 @@ struct _BDBT_P(Key_t){
         return t<1>(
           list,
           #if defined(BDBT_set_KeySize)
-            ta,
+            #if !defined(BDBT_set_MaxKeySize)
+              ta_t *ta,
+            #endif
             KeySize,
           #endif
           Key
@@ -279,7 +305,9 @@ struct _BDBT_P(Key_t){
         return t<>(
           list,
           #if defined(BDBT_set_KeySize)
-            ta,
+            #if !defined(BDBT_set_MaxKeySize)
+              ta_t *ta,
+            #endif
             KeySize,
           #endif
           Key

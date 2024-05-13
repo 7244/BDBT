@@ -85,14 +85,6 @@
   #error ?
 #endif
 
-#if defined(_WITCH_PATH)
-  #define _BDBT_INCLUDE _WITCH_PATH
-#elif defined(_FAN_PATH)
-  #define _BDBT_INCLUDE _FAN_PATH
-#else
-  #define _BDBT_INCLUDE(p) <p>
-#endif
-
 #ifdef BDBT_set_base_prefix
   #define _BDBT_BP(p0) CONCAT3(BDBT_set_base_prefix, _, p0)
 #else
@@ -108,8 +100,6 @@
 #ifdef BDBT_set_base_prefix
   #undef BDBT_set_base_prefix
 #endif
-
-#undef _BDBT_INCLUDE
 
 #ifdef BDBT_set_MaxKeySize
   #undef BDBT_set_MaxKeySize

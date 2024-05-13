@@ -25,7 +25,7 @@ BDBT_StructEnd(_BDBT_P(Node_t))
 #define BVEC_set_prefix _BDBT_P(_NodeList)
 #define BVEC_set_NodeType BDBT_set_type_node
 #define BVEC_set_NodeData _BDBT_P(Node_t)
-#include _BDBT_INCLUDE(BVEC/BVEC.h)
+#include <BVEC/BVEC.h>
 
 BDBT_StructBegin(_BDBT_P(t))
   #if BDBT_set_StoreFormat == 0

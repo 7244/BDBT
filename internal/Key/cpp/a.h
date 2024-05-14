@@ -21,7 +21,7 @@ if _BDBT_ksizeConstexpr(BeforeLast != 0){
     }
     Byte >>= m;
     for(uint8_t i = m; i < 8; i += BDBT_set_BitPerNode){
-      uint8_t k = Byte & _BDBT_set_ElementPerNode - 1;
+      uint8_t k = Byte & _BDBT_ElementPerNode - 1;
       _BDBT_BP(NodeReference_t) pnr = cnr;
       cnr = _BDBT_BP(NewNode)(list);
       _BDBT_BP(Node_t) *Node = _BDBT_BP(GetNodeByReference)(list, pnr);
@@ -44,7 +44,7 @@ if _BDBT_ksizeConstexpr(BeforeLast > 8){
       Byte = ReverseKeyByte(Byte);
     }
     for(uint8_t i = 0; i < 8; i += BDBT_set_BitPerNode){
-      uint8_t k = Byte & _BDBT_set_ElementPerNode - 1;
+      uint8_t k = Byte & _BDBT_ElementPerNode - 1;
       _BDBT_BP(NodeReference_t) pnr = cnr;
       cnr = _BDBT_BP(NewNode)(list);
       _BDBT_BP(Node_t) *Node = _BDBT_BP(GetNodeByReference)(list, pnr);
@@ -74,7 +74,7 @@ if _BDBT_ksizeConstexpr(BeforeLast > 8){
   }
   Byte >>= m;
   for(uint8_t i = 8 - BDBT_set_BitPerNode; i > m ; i -= BDBT_set_BitPerNode){
-    uint8_t k = Byte & _BDBT_set_ElementPerNode - 1;
+    uint8_t k = Byte & _BDBT_ElementPerNode - 1;
     _BDBT_BP(NodeReference_t) pnr = cnr;
     cnr = _BDBT_BP(NewNode)(list);
     _BDBT_BP(Node_t) *Node = _BDBT_BP(GetNodeByReference)(list, pnr);
@@ -82,7 +82,7 @@ if _BDBT_ksizeConstexpr(BeforeLast > 8){
     Byte >>= BDBT_set_BitPerNode;
   }
 
-  uint8_t k = Byte & _BDBT_set_ElementPerNode - 1;
+  uint8_t k = Byte & _BDBT_ElementPerNode - 1;
   _BDBT_BP(Node_t) *Node = _BDBT_BP(GetNodeByReference)(list, cnr);
   Node->n[k] = Output;
 }

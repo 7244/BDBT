@@ -1,3 +1,5 @@
+#define _BDBT_ElementPerNode (1 << BDBT_set_BitPerNode)
+
 #if BDBT_set_StructFormat == 0
   #define BDBT_StructBegin(n) typedef struct{
   #define BDBT_StructEnd(n) }n;
@@ -31,3 +33,5 @@
 
 #undef BDBT_StructBegin
 #undef BDBT_StructEnd
+
+#undef _BDBT_ElementPerNode

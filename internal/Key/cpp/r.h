@@ -22,12 +22,12 @@ KeySize_t From = 0;
       Byte = ReverseKeyByte(Byte);
     }
     for(uint8_t i = 0; i < 8 / BDBT_set_BitPerNode; i++){
-      uint8_t k = Byte & _BDBT_set_ElementPerNode - 1;
+      uint8_t k = Byte & _BDBT_ElementPerNode - 1;
       tna[KeyIndex + i] = *cnr;
       tka[KeyIndex + i] = k;
       _BDBT_BP(Node_t) *Node = _BDBT_BP(GetNodeByReference)(list, *cnr);
       *cnr = Node->n[k];
-      for(_BDBT_BP(NodeEIT_t) ki = 0; ki < _BDBT_set_ElementPerNode; ki++){
+      for(_BDBT_BP(NodeEIT_t) ki = 0; ki < _BDBT_ElementPerNode; ki++){
         if(ki == k){
           continue;
         }

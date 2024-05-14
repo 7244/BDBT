@@ -4,9 +4,9 @@
 
 typedef BDBT_set_type_node _BDBT_P(NodeReference_t);
 
-#if _BDBT_set_ElementPerNode < 0xff
+#if _BDBT_ElementPerNode < 0xff
   typedef uint8_t _BDBT_P(NodeEIT_t);
-#elif _BDBT_set_ElementPerNode < 0xffff
+#elif _BDBT_ElementPerNode < 0xffff
   typedef uint16_t _BDBT_P(NodeEIT_t);
 #else
   #error no
@@ -16,7 +16,7 @@ typedef BDBT_set_type_node _BDBT_P(NodeReference_t);
   #pragma pack(push, 1)
 #endif
 BDBT_StructBegin(_BDBT_P(Node_t))
-  _BDBT_P(NodeReference_t) n[_BDBT_set_ElementPerNode];
+  _BDBT_P(NodeReference_t) n[_BDBT_ElementPerNode];
 BDBT_StructEnd(_BDBT_P(Node_t))
 #if BDBT_set_PadNode == 0
   #pragma pack(pop)
@@ -232,7 +232,7 @@ _BDBT_P(NewNode)
 
   {
     _BDBT_P(Node_t) *Node = _BDBT_P(_GetNodeByReference)(list, NodeReference);
-    for(_BDBT_P(NodeEIT_t) i = 0; i < _BDBT_set_ElementPerNode; i++){
+    for(_BDBT_P(NodeEIT_t) i = 0; i < _BDBT_ElementPerNode; i++){
       Node->n[i] = _BDBT_P(gnric)(list);
     }
   }
@@ -256,7 +256,7 @@ _BDBT_P(NewNodeBranchly)
 
   {
     _BDBT_P(Node_t) *Node = _BDBT_P(_GetNodeByReference)(list, NodeReference);
-    for(_BDBT_P(NodeEIT_t) i = 0; i < _BDBT_set_ElementPerNode; i++){
+    for(_BDBT_P(NodeEIT_t) i = 0; i < _BDBT_ElementPerNode; i++){
       Node->n[i] = BNR[i];
     }
   }
@@ -300,7 +300,7 @@ _BDBT_P(inrhc)
   _BDBT_P(NodeReference_t) nr
 ){
   _BDBT_P(Node_t) *n = _BDBT_P(GetNodeByReference)(list, nr);
-  for(_BDBT_P(NodeEIT_t) i = 0; i < _BDBT_set_ElementPerNode; i++){
+  for(_BDBT_P(NodeEIT_t) i = 0; i < _BDBT_ElementPerNode; i++){
     if(_BDBT_P(inric)(list, n->n[i]) == 0){
       return 1;
     }

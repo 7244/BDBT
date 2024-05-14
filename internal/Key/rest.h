@@ -18,7 +18,7 @@ _BDBT_P(KeyInFrom)
       uint8_t Byte = *kp8;
       Byte >>= m;
       for(uint8_t i = m; i < 8; i += BDBT_set_BitPerNode){
-        uint8_t k = Byte & _BDBT_set_ElementPerNode - 1;
+        uint8_t k = Byte & _BDBT_ElementPerNode - 1;
         _BDBT_BP(NodeReference_t) pnr = cnr;
         cnr = _BDBT_BP(NewNode)(list);
         _BDBT_BP(Node_t) *Node = _BDBT_BP(GetNodeByReference)(list, pnr);
@@ -33,7 +33,7 @@ _BDBT_P(KeyInFrom)
     while(KeyIndex != _BDBT_Key_GetBeforeLast){
       uint8_t Byte = *kp8;
       for(uint8_t i = 0; i < 8; i += BDBT_set_BitPerNode){
-        uint8_t k = Byte & _BDBT_set_ElementPerNode - 1;
+        uint8_t k = Byte & _BDBT_ElementPerNode - 1;
         _BDBT_BP(NodeReference_t) pnr = cnr;
         cnr = _BDBT_BP(NewNode)(list);
         _BDBT_BP(Node_t) *Node = _BDBT_BP(GetNodeByReference)(list, pnr);
@@ -49,7 +49,7 @@ _BDBT_P(KeyInFrom)
     if(_BDBT_Key_GetBeforeLast == 0){
       Byte >>= KeyIndex;
       for(uint8_t i = KeyIndex; i < 8 - BDBT_set_BitPerNode; i += BDBT_set_BitPerNode){
-        uint8_t k = Byte & _BDBT_set_ElementPerNode - 1;
+        uint8_t k = Byte & _BDBT_ElementPerNode - 1;
         _BDBT_BP(NodeReference_t) pnr = cnr;
         cnr = _BDBT_BP(NewNode)(list);
         _BDBT_BP(Node_t) *Node = _BDBT_BP(GetNodeByReference)(list, pnr);
@@ -61,7 +61,7 @@ _BDBT_P(KeyInFrom)
       uint8_t m = KeyIndex % 8;
       Byte >>= m;
       for(uint8_t i = m; i < 8 - BDBT_set_BitPerNode; i += BDBT_set_BitPerNode){
-        uint8_t k = Byte & _BDBT_set_ElementPerNode - 1;
+        uint8_t k = Byte & _BDBT_ElementPerNode - 1;
         _BDBT_BP(NodeReference_t) pnr = cnr;
         cnr = _BDBT_BP(NewNode)(list);
         _BDBT_BP(Node_t) *Node = _BDBT_BP(GetNodeByReference)(list, pnr);
@@ -69,7 +69,7 @@ _BDBT_P(KeyInFrom)
         Byte >>= BDBT_set_BitPerNode;
       }
     }
-    uint8_t k = Byte & _BDBT_set_ElementPerNode - 1;
+    uint8_t k = Byte & _BDBT_ElementPerNode - 1;
     _BDBT_BP(Node_t) *Node = _BDBT_BP(GetNodeByReference)(list, cnr);
     Node->n[k] = Output;
   }
@@ -91,7 +91,7 @@ _BDBT_P(KeyQuery)
   while(*KeyIndex != _BDBT_Key_GetKeySize){
     uint8_t Byte = *kp8;
     for(uint8_t i = 0; i < 8; i += BDBT_set_BitPerNode){
-      uint8_t k = Byte & _BDBT_set_ElementPerNode - 1;
+      uint8_t k = Byte & _BDBT_ElementPerNode - 1;
       _BDBT_BP(Node_t) *Node = _BDBT_BP(GetNodeByReference)(list, *cnr);
       _BDBT_BP(NodeReference_t) nnr = Node->n[k];
       if(nnr == _BDBT_BP(GetNotValidNodeReference)(list)){
@@ -142,12 +142,12 @@ _BDBT_P(KeyRemove)
     while(KeyIndex != _BDBT_Key_GetKeySize / BDBT_set_BitPerNode){
       uint8_t Byte = *kp8;
       for(uint8_t i = 0; i < 8 / BDBT_set_BitPerNode; i++){
-        uint8_t k = Byte & _BDBT_set_ElementPerNode - 1;
+        uint8_t k = Byte & _BDBT_ElementPerNode - 1;
         tna[KeyIndex + i] = cnr;
         tka[KeyIndex + i] = k;
         _BDBT_BP(Node_t) *Node = _BDBT_BP(GetNodeByReference)(list, cnr);
         cnr = Node->n[k];
-        for(_BDBT_BP(NodeEIT_t) ki = 0; ki < _BDBT_set_ElementPerNode; ki++){
+        for(_BDBT_BP(NodeEIT_t) ki = 0; ki < _BDBT_ElementPerNode; ki++){
           if(ki == k){
             continue;
           }
@@ -234,7 +234,7 @@ _BDBT_P(KeyTraverse)
   _BDBT_Key_ParameterKeySize(__ca__,)
 ){
   gt_begin:
-  while(__a(KeyTraverse->Current,tka) < _BDBT_set_ElementPerNode){
+  while(__a(KeyTraverse->Current,tka) < _BDBT_ElementPerNode){
     _BDBT_BP(Node_t) *Node = _BDBT_BP(GetNodeByReference)(list, __a(KeyTraverse->Current,tna));
 
     uint8_t tk = __a(KeyTraverse->Current,tka)++;
@@ -242,7 +242,7 @@ _BDBT_P(KeyTraverse)
     if(nnr != _BDBT_BP(GetNotValidNodeReference)(list)){
       _BDBT_P(KeySize_t) d8 = KeyTraverse->Current * BDBT_set_BitPerNode / 8;
       _BDBT_P(KeySize_t) m8 = KeyTraverse->Current * BDBT_set_BitPerNode % 8;
-      ((uint8_t *)Key)[d8] ^= ((uint8_t *)Key)[d8] & _BDBT_set_ElementPerNode - 1 << m8;
+      ((uint8_t *)Key)[d8] ^= ((uint8_t *)Key)[d8] & _BDBT_ElementPerNode - 1 << m8;
       ((uint8_t *)Key)[d8] |= tk << m8;
       if(KeyTraverse->Current == _BDBT_Key_GetKeySize / BDBT_set_BitPerNode - 1){
         KeyTraverse->Output = nnr;

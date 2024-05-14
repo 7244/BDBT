@@ -3,7 +3,7 @@ auto tp = &ta[Current];
 while(
   BitOrder == BitOrderHigh ?
   tp->k != (KeyNodeIterator_t)-1 :
-  tp->k < _BDBT_set_ElementPerNode
+  tp->k < _BDBT_ElementPerNode
 ){
   _BDBT_BP(Node_t) *Node = _BDBT_BP(GetNodeByReference)(list, tp->n);
 
@@ -26,7 +26,7 @@ while(
     m8 = Current * BDBT_set_BitPerNode % 8;
   }
 
-  ((uint8_t *)Key)[d8] ^= ((uint8_t *)Key)[d8] & _BDBT_set_ElementPerNode - 1 << m8;
+  ((uint8_t *)Key)[d8] ^= ((uint8_t *)Key)[d8] & _BDBT_ElementPerNode - 1 << m8;
   ((uint8_t *)Key)[d8] |= tk << m8;
 
   if(Current == KeySize / BDBT_set_BitPerNode - 1){
@@ -36,7 +36,7 @@ while(
 
   tp = &ta[++Current];
   tp->n = nnr;
-  tp->k = BitOrder == BitOrderHigh ? _BDBT_set_ElementPerNode - 1 : 0;
+  tp->k = BitOrder == BitOrderHigh ? _BDBT_ElementPerNode - 1 : 0;
 }
 if(Current == 0){
   return 0;

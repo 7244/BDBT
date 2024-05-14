@@ -54,9 +54,9 @@ struct _BDBT_P(Key_t){
   #define BeforeLast (KeySize - 8)
 
   typedef std::conditional_t<
-    _BDBT_set_ElementPerNode <= 0xff,
+    _BDBT_ElementPerNode <= 0xff,
     uint8_t,
-      std::conditional_t<_BDBT_set_ElementPerNode <= 0xffff,
+      std::conditional_t<_BDBT_ElementPerNode <= 0xffff,
       uint16_t,
       uint32_t
     >
@@ -210,7 +210,7 @@ struct _BDBT_P(Key_t){
       _BDBT_BP(NodeReference_t) rnr
     ){
       Current = 0;
-      ta[0].k = BitOrder == BitOrderHigh ? _BDBT_set_ElementPerNode - 1 : 0;
+      ta[0].k = BitOrder == BitOrderHigh ? _BDBT_ElementPerNode - 1 : 0;
       ta[0].n = rnr;
     }
     void

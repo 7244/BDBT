@@ -73,18 +73,6 @@
   #define BDBT_set_BitPerNode 2
 #endif
 
-#if BDBT_set_BitPerNode == 1
-  #define _BDBT_set_ElementPerNode 0x2
-#elif BDBT_set_BitPerNode == 2
-  #define _BDBT_set_ElementPerNode 0x4
-#elif BDBT_set_BitPerNode == 4
-  #define _BDBT_set_ElementPerNode 0x10
-#elif BDBT_set_BitPerNode == 8
-  #define _BDBT_set_ElementPerNode 0x100
-#else
-  #error ?
-#endif
-
 #ifdef BDBT_set_base_prefix
   #define _BDBT_BP(p0) CONCAT3(BDBT_set_base_prefix, _, p0)
 #else
@@ -104,7 +92,6 @@
 #ifdef BDBT_set_MaxKeySize
   #undef BDBT_set_MaxKeySize
 #endif
-#undef _BDBT_set_ElementPerNode
 #undef BDBT_set_BitPerNode
 #ifdef BDBT_set_CPP_ConstructDestruct
   #undef BDBT_set_CPP_ConstructDestruct

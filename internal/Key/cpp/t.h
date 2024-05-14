@@ -5,13 +5,13 @@ while(
   tp->k != (KeyNodeIterator_t)-1 :
   tp->k < _BDBT_ElementPerNode
 ){
-  _BDBT_BP(Node_t) *Node = _BDBT_BP(GetNodeByReference)(list, tp->n);
+  auto Node = list->GetNodeByReference(tp->n);
 
   KeyNodeIterator_t tk = tp->k;
   BitOrder == BitOrderHigh ? --tp->k : ++tp->k;
 
   _BDBT_BP(NodeReference_t) nnr = Node->n[tk];
-  if(_BDBT_BP(inric)(list, nnr) == true){
+  if(list->inric(nnr)){
     continue;
   }
 

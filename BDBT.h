@@ -9,6 +9,9 @@
 #ifdef BDBT_set_BaseLibrary
   #error outdated setting. this is no longer here.
 #endif
+#ifdef BDBT_set_IsNodeUnlinked
+  #error outdated setting BDBT_set_IsNodeUnlinked. this is no longer supported.
+#endif
 
 /* --- outdated --- */
 
@@ -43,13 +46,6 @@
 #endif
 #ifndef BDBT_set_debug_InvalidAction
   #define BDBT_set_debug_InvalidAction 0
-#endif
-#ifndef BDBT_set_IsNodeUnlinked
-  #if BDBT_set_debug_InvalidAction == 1
-    #define BDBT_set_IsNodeUnlinked 1
-  #else
-    #define BDBT_set_IsNodeUnlinked 0
-  #endif
 #endif
 #ifndef BDBT_set_ResizeListAfterClear
   #define BDBT_set_ResizeListAfterClear 0
@@ -103,7 +99,6 @@
 #undef BDBT_set_type_node
 #undef BDBT_set_PadNode
 #undef BDBT_set_debug_InvalidAction
-#undef BDBT_set_IsNodeUnlinked
 #undef BDBT_set_ResizeListAfterClear
 #undef BDBT_set_UseUninitialisedValues
 #ifdef BDBT_set_base_namespace

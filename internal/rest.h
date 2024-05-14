@@ -28,9 +28,7 @@ BDBT_StructEnd(_BDBT_P(Node_t))
 #include <BVEC/BVEC.h>
 
 BDBT_StructBegin(_BDBT_P(t))
-  #if BDBT_set_StoreFormat == 0
-    _BDBT_P(_NodeList_t) NodeList;
-  #endif
+  _BDBT_P(_NodeList_t) NodeList;
   struct{
     _BDBT_P(NodeReference_t) c;
     _BDBT_P(NodeReference_t) p;
@@ -40,8 +38,139 @@ BDBT_StructBegin(_BDBT_P(t))
   BDBT_StructEnd(_BDBT_P(t))
 #endif
 
-  _BDBT_fdec(void, _AfterInitNodes)
-  {
+  /* is node reference invalid */
+  _BDBT_fdec(bool, inri,
+    _BDBT_P(NodeReference_t) NodeReference
+  ){
+    /* TODO it needs recycle check too */
+    __abort();
+    return NodeReference >= _BDBT_this->NodeList.Current;
+  }
+
+  /* get node reference invalid constant */
+  _BDBT_fdec(_BDBT_P(NodeReference_t), gnric
+  ){
+    return (_BDBT_P(NodeReference_t))
+      #if BDBT_set_UseZeroAsInvalid == 0
+        -1
+      #else
+        0
+      #endif
+    ;
+  }
+
+  /* is node reference invalid constant */
+  _BDBT_fdec(bool, inric,
+    _BDBT_P(NodeReference_t) NodeReference
+  ){
+    return NodeReference == _BDBT_fcall(gnric);
+  }
+
+  _BDBT_fdec(_BDBT_P(Node_t) *, _GetNodeByReference,
+    _BDBT_P(NodeReference_t) NodeReference
+  ){
+    return &((_BDBT_P(Node_t) *)&_BDBT_this->NodeList.ptr[0])[NodeReference];
+  }
+
+  _BDBT_fdec(_BDBT_P(Node_t) *, GetNodeByReference,
+    _BDBT_P(NodeReference_t) NodeReference
+  ){
+    #if BDBT_set_debug_InvalidAction == 1
+      if(_BDBT_fcall(inri, NodeReference)){
+        __abort();
+      }
+    #endif
+    return _BDBT_fcall(_GetNodeByReference, NodeReference);
+  }
+
+  _BDBT_fdec(_BDBT_P(NodeReference_t), usage
+  ){
+    return _BDBT_this->NodeList.Current - _BDBT_this->e.p;
+  }
+
+  _BDBT_fdec(_BDBT_P(NodeReference_t), NewNode_empty
+  ){
+    _BDBT_P(NodeReference_t) NodeReference = _BDBT_this->e.c;
+    _BDBT_this->e.c = _BDBT_fcall(_GetNodeByReference, NodeReference)->n[0];
+    _BDBT_this->e.p--;
+    return NodeReference;
+  }
+  _BDBT_fdec(_BDBT_P(NodeReference_t), NewNode_alloc
+  ){
+    _BDBT_P(_NodeList_AddEmpty)(&_BDBT_this->NodeList, 1);
+    return _BDBT_this->NodeList.Current - 1;
+  }
+  _BDBT_fdec(_BDBT_P(NodeReference_t), NewNode
+  ){
+    _BDBT_P(NodeReference_t) NodeReference;
+    if(_BDBT_this->e.p){
+      NodeReference = _BDBT_fcall(NewNode_empty);
+    }
+    else{
+      NodeReference = _BDBT_fcall(NewNode_alloc);
+    }
+
+    {
+      _BDBT_P(Node_t) *Node = _BDBT_fcall(_GetNodeByReference, NodeReference);
+      for(_BDBT_P(NodeEIT_t) i = 0; i < _BDBT_ElementPerNode; i++){
+        Node->n[i] = _BDBT_fcall(gnric);
+      }
+    }
+
+    return NodeReference;
+  }
+  _BDBT_fdec(_BDBT_P(NodeReference_t), NewNodeBranchly,
+    _BDBT_P(NodeReference_t) *BNR /* branch node references */
+  ){
+    _BDBT_P(NodeReference_t) NodeReference;
+    if(_BDBT_this->e.p){
+      NodeReference = _BDBT_fcall(NewNode_empty);
+    }
+    else{
+      NodeReference = _BDBT_fcall(NewNode_alloc);
+    }
+
+    {
+      _BDBT_P(Node_t) *Node = _BDBT_fcall(_GetNodeByReference, NodeReference);
+      for(_BDBT_P(NodeEIT_t) i = 0; i < _BDBT_ElementPerNode; i++){
+        Node->n[i] = BNR[i];
+      }
+    }
+
+    return NodeReference;
+  }
+
+  _BDBT_fdec(void, Recycle,
+    _BDBT_P(NodeReference_t) NodeReference
+  ){
+    _BDBT_P(Node_t) *Node = _BDBT_fcall(GetNodeByReference, NodeReference);
+
+    Node->n[0] = _BDBT_this->e.c;
+    _BDBT_this->e.c = NodeReference;
+    _BDBT_this->e.p++;
+  }
+
+  _BDBT_fdec(void, PreAllocateNodes,
+    _BDBT_P(NodeReference_t) Amount
+  ){
+    _BDBT_P(_NodeList_Reserve)(&_BDBT_this->NodeList, Amount);
+  }
+
+  /* is node reference has child */
+  _BDBT_fdec(bool, inrhc,
+    _BDBT_P(NodeReference_t) nr
+  ){
+    _BDBT_P(Node_t) *n = _BDBT_fcall(GetNodeByReference, nr);
+    for(_BDBT_P(NodeEIT_t) i = 0; i < _BDBT_ElementPerNode; i++){
+      if(!_BDBT_fcall(inric, n->n[i])){
+        return 1;
+      }
+    }
+    return 0;
+  }
+
+  _BDBT_fdec(void, _AfterInitNodes
+  ){
     _BDBT_this->e.p = 0;
     #if BDBT_set_UseZeroAsInvalid == 1
       /* reserved */
@@ -49,8 +178,8 @@ BDBT_StructBegin(_BDBT_P(t))
     #endif
   }
 
-  _BDBT_fdec(void, Open)
-  {
+  _BDBT_fdec(void, Open
+  ){
     #if BDBT_set_UseUninitialisedValues == 0
       _BDBT_this->e.c = 0;
     #endif
@@ -58,14 +187,15 @@ BDBT_StructBegin(_BDBT_P(t))
     _BDBT_P(_NodeList_Open)(&_BDBT_this->NodeList);
     _BDBT_fcall(_AfterInitNodes);
   }
-  _BDBT_fdec(void, Close)
-  {
+  _BDBT_fdec(void, Close
+  ){
     _BDBT_P(_NodeList_Close)(&_BDBT_this->NodeList);
   }
-  _BDBT_fdec(void, Clear)
-  {
+  _BDBT_fdec(void, Clear
+  ){
     #if BDBT_set_ResizeListAfterClear == 1
       /* TODO implement this */
+      __abort();
     #else
       _BDBT_P(_NodeList_Clear)(&_BDBT_this->NodeList);
     #endif
@@ -85,228 +215,6 @@ BDBT_StructBegin(_BDBT_P(t))
 #ifdef BDBT_set_lcpp
   BDBT_StructEnd(_BDBT_P(t))
 #endif
-
-/* is node reference invalid */
-static
-bool
-_BDBT_P(inri)
-(
-  _BDBT_P(t) *list,
-  _BDBT_P(NodeReference_t) NodeReference
-){
-  return NodeReference >= list->NodeList.Current;
-}
-
-/* get node reference invalid constant */
-static
-_BDBT_P(NodeReference_t)
-_BDBT_P(gnric)
-(
-  _BDBT_P(t) *list
-){
-  return (_BDBT_P(NodeReference_t))
-    #if BDBT_set_UseZeroAsInvalid == 0
-      -1
-    #else
-      0
-    #endif
-  ;
-}
-
-/* is node reference invalid constant */
-static
-bool
-_BDBT_P(inric)
-(
-  _BDBT_P(t) *list,
-  _BDBT_P(NodeReference_t) NodeReference
-){
-  return NodeReference == _BDBT_P(gnric)(list);
-}
-
-#if BDBT_set_IsNodeUnlinked == 1
-  static
-  bool
-  _BDBT_P(IsNodeUnlinked)
-  (
-    _BDBT_P(t) *list,
-    _BDBT_P(Node_t) *Node
-  ){
-    if(Node->n[1] == _BDBT_P(gnric)(list)){
-      return 1;
-    }
-    return 0;
-  }
-  static
-  bool
-  _BDBT_P(IsNodeReferenceUnlinked)
-  (
-    _BDBT_P(t) *list,
-    _BDBT_P(NodeReference_t) NodeReference
-  ){
-    _BDBT_P(Node_t) *Node = &((_BDBT_P(Node_t) *)&list->nodes.ptr[0])[NodeReference];
-    return _BDBT_P(IsNodeUnlinked)(list, Node);
-  }
-#endif
-
-static
-_BDBT_P(Node_t) *
-_BDBT_P(_GetNodeByReference)
-(
-  _BDBT_P(t) *list,
-  _BDBT_P(NodeReference_t) NodeReference
-){
-  return &((_BDBT_P(Node_t) *)&list->NodeList.ptr[0])[NodeReference];
-}
-
-static
-_BDBT_P(Node_t) *
-_BDBT_P(GetNodeByReference)
-(
-  _BDBT_P(t) *list,
-  _BDBT_P(NodeReference_t) NodeReference
-){
-  #if BDBT_set_debug_InvalidAction == 1
-    if(NodeReference >= list->nodes.Current){
-      PR_abort();
-    }
-  #endif
-  _BDBT_P(Node_t) *Node = _BDBT_P(_GetNodeByReference)(list, NodeReference);
-  #if BDBT_set_debug_InvalidAction == 1
-    do{
-      if(_BDBT_P(IsNodeUnlinked)(list, Node)){
-        PR_abort();
-      }
-    }while(0);
-  #endif
-  return Node;
-}
-
-#if BDBT_set_StoreFormat == 0
-  static
-  _BDBT_P(NodeReference_t)
-  _BDBT_P(usage)
-  (
-    _BDBT_P(t) *list
-  ){
-    return list->NodeList.Current - list->e.p;
-  }
-#else
-  #error ?
-  /* pain */
-#endif
-
-static
-_BDBT_P(NodeReference_t)
-_BDBT_P(NewNode_empty)
-(
-  _BDBT_P(t) *list
-){
-  _BDBT_P(NodeReference_t) NodeReference = list->e.c;
-  list->e.c = _BDBT_P(_GetNodeByReference)(list, NodeReference)->n[0];
-  list->e.p--;
-  return NodeReference;
-}
-static
-_BDBT_P(NodeReference_t)
-_BDBT_P(NewNode_alloc)
-(
-  _BDBT_P(t) *list
-){
-  _BDBT_P(_NodeList_AddEmpty)(&list->NodeList, 1);
-  return list->NodeList.Current - 1;
-}
-static
-_BDBT_P(NodeReference_t)
-_BDBT_P(NewNode)
-(
-  _BDBT_P(t) *list
-){
-  _BDBT_P(NodeReference_t) NodeReference;
-  if(list->e.p){
-    NodeReference = _BDBT_P(NewNode_empty)(list);
-  }
-  else{
-    NodeReference = _BDBT_P(NewNode_alloc)(list);
-  }
-
-  {
-    _BDBT_P(Node_t) *Node = _BDBT_P(_GetNodeByReference)(list, NodeReference);
-    for(_BDBT_P(NodeEIT_t) i = 0; i < _BDBT_ElementPerNode; i++){
-      Node->n[i] = _BDBT_P(gnric)(list);
-    }
-  }
-
-  return NodeReference;
-}
-static
-_BDBT_P(NodeReference_t)
-_BDBT_P(NewNodeBranchly)
-(
-  _BDBT_P(t) *list,
-  _BDBT_P(NodeReference_t) *BNR /* branch node references */
-){
-  _BDBT_P(NodeReference_t) NodeReference;
-  if(list->e.p){
-    NodeReference = _BDBT_P(NewNode_empty)(list);
-  }
-  else{
-    NodeReference = _BDBT_P(NewNode_alloc)(list);
-  }
-
-  {
-    _BDBT_P(Node_t) *Node = _BDBT_P(_GetNodeByReference)(list, NodeReference);
-    for(_BDBT_P(NodeEIT_t) i = 0; i < _BDBT_ElementPerNode; i++){
-      Node->n[i] = BNR[i];
-    }
-  }
-
-  return NodeReference;
-}
-
-static
-void
-_BDBT_P(Recycle)
-(
-  _BDBT_P(t) *list,
-  _BDBT_P(NodeReference_t) NodeReference
-){
-  _BDBT_P(Node_t) *Node = _BDBT_P(GetNodeByReference)(list, NodeReference);
-
-  Node->n[0] = list->e.c;
-  #if BDBT_set_IsNodeUnlinked == 1
-    Node->n[1] = _BDBT_P(gnric)(list);
-  #endif
-  list->e.c = NodeReference;
-  list->e.p++;
-}
-
-static
-void
-_BDBT_P(PreAllocateNodes)
-(
-  _BDBT_P(t) *list,
-  _BDBT_P(NodeReference_t) Amount
-){
-  _BDBT_P(_NodeList_Reserve)(&list->NodeList, Amount);
-}
-
-/* is node reference has child */
-static
-bool
-_BDBT_P(inrhc)
-(
-  _BDBT_P(t) *list,
-  _BDBT_P(NodeReference_t) nr
-){
-  _BDBT_P(Node_t) *n = _BDBT_P(GetNodeByReference)(list, nr);
-  for(_BDBT_P(NodeEIT_t) i = 0; i < _BDBT_ElementPerNode; i++){
-    if(_BDBT_P(inric)(list, n->n[i]) == 0){
-      return 1;
-    }
-  }
-  return 0;
-}
 
 #ifdef BDBT_set_namespace
   }

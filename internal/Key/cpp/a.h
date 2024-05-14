@@ -1,7 +1,3 @@
-#ifndef ENDIAN
-  #error ENDIAN needs to be defined
-#endif
-
 uint8_t *kp8;
 if constexpr(BitOrderMatters == true && ENDIAN == 1){
   kp8 = &((uint8_t *)Key)[KeySize / 8 - 1];
@@ -23,8 +19,8 @@ if _BDBT_ksizeConstexpr(BeforeLast != 0){
     for(uint8_t i = m; i < 8; i += BDBT_set_BitPerNode){
       uint8_t k = Byte & _BDBT_ElementPerNode - 1;
       _BDBT_BP(NodeReference_t) pnr = cnr;
-      cnr = _BDBT_BP(NewNode)(list);
-      _BDBT_BP(Node_t) *Node = _BDBT_BP(GetNodeByReference)(list, pnr);
+      cnr = list->NewNode();
+      _BDBT_BP(Node_t) *Node = list->GetNodeByReference(pnr);
       Node->n[k] = cnr;
       Byte >>= BDBT_set_BitPerNode;
     }
@@ -46,8 +42,8 @@ if _BDBT_ksizeConstexpr(BeforeLast > 8){
     for(uint8_t i = 0; i < 8; i += BDBT_set_BitPerNode){
       uint8_t k = Byte & _BDBT_ElementPerNode - 1;
       _BDBT_BP(NodeReference_t) pnr = cnr;
-      cnr = _BDBT_BP(NewNode)(list);
-      _BDBT_BP(Node_t) *Node = _BDBT_BP(GetNodeByReference)(list, pnr);
+      cnr = list->NewNode();
+      _BDBT_BP(Node_t) *Node = list->GetNodeByReference(pnr);
       Node->n[k] = cnr;
       Byte >>= BDBT_set_BitPerNode;
     }
@@ -76,13 +72,13 @@ if _BDBT_ksizeConstexpr(BeforeLast > 8){
   for(uint8_t i = 8 - BDBT_set_BitPerNode; i > m ; i -= BDBT_set_BitPerNode){
     uint8_t k = Byte & _BDBT_ElementPerNode - 1;
     _BDBT_BP(NodeReference_t) pnr = cnr;
-    cnr = _BDBT_BP(NewNode)(list);
-    _BDBT_BP(Node_t) *Node = _BDBT_BP(GetNodeByReference)(list, pnr);
+    cnr = list->NewNode();
+    _BDBT_BP(Node_t) *Node = list->GetNodeByReference(pnr);
     Node->n[k] = cnr;
     Byte >>= BDBT_set_BitPerNode;
   }
 
   uint8_t k = Byte & _BDBT_ElementPerNode - 1;
-  _BDBT_BP(Node_t) *Node = _BDBT_BP(GetNodeByReference)(list, cnr);
+  _BDBT_BP(Node_t) *Node = list->GetNodeByReference(cnr);
   Node->n[k] = Output;
 }

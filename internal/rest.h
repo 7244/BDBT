@@ -180,7 +180,7 @@ BDBT_StructBegin(_BDBT_P(t))
 
   _BDBT_fdec(void, Open
   ){
-    #if BDBT_set_UseUninitialisedValues == 0
+    #if __sanit
       _BDBT_this->e.c = 0;
     #endif
 

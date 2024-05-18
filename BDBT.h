@@ -12,6 +12,9 @@
 #ifdef BDBT_set_IsNodeUnlinked
   #error outdated setting BDBT_set_IsNodeUnlinked. this is no longer supported.
 #endif
+#ifdef BDBT_set_UseUninitialisedValues
+  #error outdated setting BDBT_set_UseUninitialisedValues. __sanit is used instead.
+#endif
 
 /* --- outdated --- */
 
@@ -49,15 +52,6 @@
 #endif
 #ifndef BDBT_set_ResizeListAfterClear
   #define BDBT_set_ResizeListAfterClear 0
-#endif
-#ifndef BDBT_set_UseUninitialisedValues
-  #if defined(WITCH_set_UseUninitialisedValues)
-    #define BDBT_set_UseUninitialisedValues WITCH_set_UseUninitialisedValues
-  #elif defined(fan_use_uninitialized)
-    #define BDBT_set_UseUninitialisedValues fan_use_uninitialized
-  #else
-    #define BDBT_set_UseUninitialisedValues 1
-  #endif
 #endif
 #ifndef BDBT_set_type_node
   #define BDBT_set_type_node uint32_t
@@ -100,7 +94,6 @@
 #undef BDBT_set_PadNode
 #undef BDBT_set_debug_InvalidAction
 #undef BDBT_set_ResizeListAfterClear
-#undef BDBT_set_UseUninitialisedValues
 #ifdef BDBT_set_base_namespace
   #undef BDBT_set_base_namespace
 #endif

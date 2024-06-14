@@ -27,8 +27,15 @@ while(
   }
 
   #if __sanit
-    if(m8 == 0){
-      ((uint8_t *)Key)[d8] = 0;
+    if constexpr(BitOrderMatters == true){
+      if(m8 == 8 - BDBT_set_BitPerNode){
+        ((uint8_t *)Key)[d8] = 0;
+      }
+    }
+    else{
+      if(m8 == 8 - BDBT_set_BitPerNode){
+        ((uint8_t *)Key)[d8] = 0;
+      }
     }
   #endif
   ((uint8_t *)Key)[d8] ^= ((uint8_t *)Key)[d8] & _BDBT_ElementPerNode - 1 << m8;

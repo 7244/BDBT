@@ -33,11 +33,12 @@ while(
       }
     }
     else{
-      if(m8 == 8 - BDBT_set_BitPerNode){
+      if(m8 == 0){
         ((uint8_t *)Key)[d8] = 0;
       }
     }
   #endif
+
   ((uint8_t *)Key)[d8] ^= ((uint8_t *)Key)[d8] & _BDBT_ElementPerNode - 1 << m8;
   ((uint8_t *)Key)[d8] |= tk << m8;
 

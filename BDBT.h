@@ -19,7 +19,13 @@
 /* --- outdated --- */
 
 #if !defined(BDBT_set_lc) && !defined(BDBT_set_lcpp)
-  #error BDBT_set_lc or BDBT_set_lcpp needs to be defined
+  #if defined(__language_c) && !defined(__language_cpp)
+    #define BDBT_set_lc
+  #elif !defined(__language_c) && defined(__language_cpp)
+    #define BDBT_set_lcpp
+  #else
+    #error BDBT_set_lc or BDBT_set_lcpp needs to be defined
+  #endif
 #endif
 
 #ifndef BDBT_set_AreWeInsideStruct

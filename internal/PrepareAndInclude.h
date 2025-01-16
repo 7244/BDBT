@@ -11,7 +11,7 @@
 #if BDBT_set_declare_rest == 1
   #if defined(BDBT_set_lc)
     #define _BDBT_this This
-    #define _BDBT_fdec(rtype, name, ...) static rtype name(_P(t) *This, ##__VA_ARGS__)
+    #define _BDBT_fdec(rtype, name, ...) static rtype name(_BDBT_P(t) *This, ##__VA_ARGS__)
     #define _BDBT_fcall(name, ...) name(This, ##__VA_ARGS__)
   #elif defined(BDBT_set_lcpp)
     #define _BDBT_this this

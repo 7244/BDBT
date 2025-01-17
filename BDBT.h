@@ -38,6 +38,9 @@
 #ifndef BDBT_set_prefix
   #error ifndef BDBT_set_prefix
 #endif
+#ifndef BDBT_set_base_prefix
+  #define BDBT_set_base_prefix BDBT_set_prefix
+#endif
 #ifndef BDBT_set_StructFormat
   #if defined(BDBT_set_lc)
     #define BDBT_set_StructFormat 0
@@ -72,21 +75,13 @@
   #define BDBT_set_BitPerNode 2
 #endif
 
-#ifdef BDBT_set_base_prefix
-  #define _BDBT_BP(p0) CONCAT3(BDBT_set_base_prefix, _, p0)
-#else
-  #define _BDBT_BP(p0) CONCAT3(BDBT_set_prefix, _, p0)
-#endif
+#define _BDBT_BP(p0) CONCAT3(BDBT_set_base_prefix, _, p0)
 #define _BDBT_P(p0) CONCAT3(BDBT_set_prefix, _, p0)
 
 #include "internal/PrepareAndInclude.h"
 
 #undef _BDBT_P
 #undef _BDBT_BP
-
-#ifdef BDBT_set_base_prefix
-  #undef BDBT_set_base_prefix
-#endif
 
 #ifdef BDBT_set_MaxKeySize
   #undef BDBT_set_MaxKeySize
@@ -95,6 +90,7 @@
 #ifdef BDBT_set_CPP_ConstructDestruct
   #undef BDBT_set_CPP_ConstructDestruct
 #endif
+#undef BDBT_set_base_prefix
 #undef BDBT_set_prefix
 #undef BDBT_set_declare_Key
 #undef BDBT_set_declare_rest

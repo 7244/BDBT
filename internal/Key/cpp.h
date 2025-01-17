@@ -62,23 +62,6 @@ struct _BDBT_P(Key_t){
     >
   >KeyNodeIterator_t;
 
-  static uint8_t ReverseKeyByte(uint8_t p){
-    #if BDBT_set_BitPerNode == 1
-      return bitswap8(p);
-    #elif BDBT_set_BitPerNode == 2
-      p = (p & 0xf0) >> 4 | (p & 0x0f) << 4;
-      p = (p & 0xcc) >> 2 | (p & 0x33) << 2;
-      return p;
-    #elif BDBT_set_BitPerNode == 4
-      p = (p & 0xf0) >> 4 | (p & 0x0f) << 4;
-      return p;
-    #elif BDBT_set_BitPerNode == 8
-      return p;
-    #else
-      #error ?
-    #endif
-  }
-
   /* add */
   static
   void

@@ -13,7 +13,7 @@ if _BDBT_ksizeConstexpr(BeforeLast != 0){
     uint8_t m = KeyIndex % 8;
     uint8_t Byte = *kp8;
     if constexpr(BitOrderMatters == true){
-      Byte = ReverseKeyByte(Byte);
+      Byte = list->_ReverseKeyByte(Byte);
     }
     Byte >>= m;
     for(uint8_t i = m; i < 8; i += BDBT_set_BitPerNode){
@@ -37,7 +37,7 @@ if _BDBT_ksizeConstexpr(BeforeLast > 8){
   while(KeyIndex < BeforeLast){
     uint8_t Byte = *kp8;
     if constexpr(BitOrderMatters == true){
-      Byte = ReverseKeyByte(Byte);
+      Byte = list->_ReverseKeyByte(Byte);
     }
     for(uint8_t i = 0; i < 8; i += BDBT_set_BitPerNode){
       uint8_t k = Byte & _BDBT_ElementPerNode - 1;
@@ -59,7 +59,7 @@ if _BDBT_ksizeConstexpr(BeforeLast > 8){
 {
   uint8_t Byte = *kp8;
   if constexpr(BitOrderMatters == true){
-    Byte = ReverseKeyByte(Byte);
+    Byte = list->_ReverseKeyByte(Byte);
   }
   uint8_t m;
   if _BDBT_ksizeConstexpr(BeforeLast == 0){

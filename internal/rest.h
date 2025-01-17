@@ -38,6 +38,27 @@ BDBT_StructBegin(_BDBT_P(t))
   BDBT_StructEnd(_BDBT_P(t))
 #endif
 
+  _BDBT_fdec(uint8_t, _ReverseKeyByte,
+    uint8_t p
+  ){
+    #if BDBT_set_BitPerNode == 1
+      p = (p & 0xf0) >> 4 | (p & 0x0f) << 4;
+      p = (p & 0xcc) >> 2 | (p & 0x33) << 2;
+      p = (p & 0xaa) >> 1 | (p & 0x55) << 1;
+    #elif BDBT_set_BitPerNode == 2
+      p = (p & 0xf0) >> 4 | (p & 0x0f) << 4;
+      p = (p & 0xcc) >> 2 | (p & 0x33) << 2;
+    #elif BDBT_set_BitPerNode == 4
+      p = (p & 0xf0) >> 4 | (p & 0x0f) << 4;
+    #elif BDBT_set_BitPerNode == 8
+      /* ~cheesecake~ */
+    #else
+      #error ?
+    #endif
+
+    return p;
+  }
+
   /* is node reference invalid */
   _BDBT_fdec(bool, inri,
     _BDBT_P(NodeReference_t) NodeReference

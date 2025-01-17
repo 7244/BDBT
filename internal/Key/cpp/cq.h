@@ -9,7 +9,7 @@ KeySize_t KeyIndex = 0;
 while(KeyIndex != KeySize){
   uint8_t Byte = *kp8;
   if constexpr(BitOrderMatters == true){
-    Byte = ReverseKeyByte(Byte);
+    Byte = list->_ReverseKeyByte(Byte);
   }
   for(uint8_t i = 0; i < 8; i += BDBT_set_BitPerNode){
     uint8_t k = Byte & _BDBT_ElementPerNode - 1;

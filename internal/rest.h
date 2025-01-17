@@ -1,7 +1,3 @@
-#ifdef BDBT_set_namespace
-  namespace BDBT_set_namespace {
-#endif
-
 typedef BDBT_set_type_node _BDBT_P(NodeReference_t);
 
 #if _BDBT_ElementPerNode < 0xff
@@ -235,8 +231,4 @@ BDBT_StructBegin(_BDBT_P(t))
 
 #ifdef BDBT_set_lcpp
   BDBT_StructEnd(_BDBT_P(t))
-#endif
-
-#ifdef BDBT_set_namespace
-  }
 #endif

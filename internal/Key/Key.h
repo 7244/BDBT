@@ -8,10 +8,6 @@
   #endif
 #endif
 
-#ifdef BDBT_set_namespace
-  namespace BDBT_set_namespace {
-#endif
-
 #if defined(BDBT_set_lc)
   #if BDBT_set_KeySize == 0
     #error KeySize 0 is not implemented for c yet.
@@ -44,10 +40,6 @@
   #undef _BDBT_Key_ParameterKeySize
 #elif defined(BDBT_set_lcpp)
   #include "cpp.h"
-#endif
-
-#ifdef BDBT_set_namespace
-  }
 #endif
 
 #undef BDBT_set_KeySize

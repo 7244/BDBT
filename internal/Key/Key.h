@@ -1,45 +1,107 @@
-#if !defined(BDBT_set_KeySize) && !defined(BDBT_set_lcpp)
-  #error KeySize needs to be defined
-#endif
+typedef uint8_t _BDBT_P(BitOrder_t);
+const static _BDBT_P(BitOrder_t) _BDBT_P(BitOrderLow) = 0;
+const static _BDBT_P(BitOrder_t) _BDBT_P(BitOrderHigh) = 1;
+const static _BDBT_P(BitOrder_t) _BDBT_P(BitOrderAny) = 2;
 
-#if defined(BDBT_set_KeySize)
-  #if defined(BDBT_set_lcpp) && BDBT_set_KeySize != 0
-    #error to make cpp key compiletime, dont define KeySize. to make cpp key runtime, define KeySize as 0. error(BDBT_set_KeySize != 0)
+typedef uintptr_t _BDBT_P(KeySize_t);
+
+static void _BDBT_P(Add)(
+  _BDBT_BP(t) *tree,
+  bool BitOrderMatters,
+  _BDBT_P(KeySize_t) KeySize,
+  const void *Key,
+  _BDBT_P(KeySize_t) KeyIndex,
+  _BDBT_BP(NodeReference_t) cnr,
+  _BDBT_BP(NodeReference_t) Output
+){
+  #include "Add.h"
+}
+
+static void _BDBT_P(Query)(
+  _BDBT_BP(t) *tree,
+  bool BitOrderMatters,
+  _BDBT_P(KeySize_t) KeySize,
+  const void *Key,
+  _BDBT_P(KeySize_t) *KeyIndex,
+  _BDBT_BP(NodeReference_t) *cnr
+){
+  #include "Query.h"
+}
+
+static void _BDBT_P(ConfidentQuery)(
+  _BDBT_BP(t) *tree,
+  bool BitOrderMatters,
+  _BDBT_P(KeySize_t) KeySize,
+  const void *Key,
+  _BDBT_BP(NodeReference_t) *cnr
+){
+  #include "ConfidentQuery.h"
+}
+
+typedef struct{
+  _BDBT_BP(NodeReference_t) tna;
+  uint8_t tka;
+}_BDBT_P(Remove_InternalDataPerKeyNode_t);
+
+static _BDBT_P(KeySize_t) _BDBT_P(Remove)(
+  _BDBT_BP(t) *tree,
+  #if !defined(BDBT_set_MaxKeySize)
+    _BDBT_P(Remove_InternalDataPerKeyNode_t) *idpkn,
   #endif
-#endif
+  bool BitOrderMatters,
+  _BDBT_P(KeySize_t) KeySize,
+  void *Key,
+  _BDBT_BP(NodeReference_t) *cnr
+){
+  #include "Remove.h"
+}
 
-#if defined(BDBT_set_lc)
-  #if BDBT_set_KeySize == 0
-    #error KeySize 0 is not implemented for c yet.
+typedef struct{
+  _BDBT_BP(NodeReference_t) n;
+  _BDBT_bip(_neit_t) k;
+}_BDBT_P(Traverse_InternalDataPerKeyNode_t);
+
+typedef struct{
+  _BDBT_P(KeySize_t) Current;
+  _BDBT_BP(NodeReference_t) Output;
+
+  #if defined(BDBT_set_MaxKeySize)
+    _BDBT_P(Traverse_InternalDataPerKeyNode_t) idpkn[BDBT_set_MaxKeySize / BDBT_set_BitPerNode];
+  #endif
+}_BDBT_P(Traverse_t);
+
+static void _BDBT_P(TraverseInit)(
+  _BDBT_P(Traverse_t) *tra,
+  _BDBT_P(BitOrder_t) BitOrder,
+  #if !defined(BDBT_set_MaxKeySize)
+    _BDBT_P(Traverse_InternalDataPerKeyNode_t) *idpkn,
+  #endif
+  _BDBT_BP(NodeReference_t) rnr
+){
+  tra->Current = 0;
+
+  #if defined(BDBT_set_MaxKeySize)
+    _BDBT_P(Traverse_InternalDataPerKeyNode_t) *idpkn = tra->idpkn;
   #endif
 
-  #if BDBT_set_KeySize <= 0xff
-    typedef uint8_t _BDBT_P(KeySize_t);
-  #elif BDBT_set_KeySize <= 0xffff
-    typedef uint16_t _BDBT_P(KeySize_t);
-  #elif BDBT_set_KeySize <= 0xffffffff
-    typedef uint32_t _BDBT_P(KeySize_t);
-  #else
-    #error no
+  idpkn[0].k = BitOrder == _BDBT_P(BitOrderHigh) ? _BDBT_ElementPerNode - 1 : 0;
+  idpkn[0].n = rnr;
+}
+
+static bool _BDBT_P(Traverse)(
+  _BDBT_BP(t) *tree,
+  _BDBT_P(Traverse_t) *tra,
+  #if !defined(BDBT_set_MaxKeySize)
+    _BDBT_P(Traverse_InternalDataPerKeyNode_t) *idpkn,
+  #endif
+  bool BitOrderMatters,
+  _BDBT_P(BitOrder_t) BitOrder,
+  _BDBT_P(KeySize_t) KeySize,
+  void *Key
+){
+  #if defined(BDBT_set_MaxKeySize)
+    _BDBT_P(Traverse_InternalDataPerKeyNode_t) *idpkn = tra->idpkn;
   #endif
 
-  #define _BDBT_Key_ParameterKeySize(p0, p1)
-  #define _BDBT_Key_GetKeySize BDBT_set_KeySize
-  #define _BDBT_Key_PassKeySize
-  #define _BDBT_Key_PrepareBeforeLast
-  #define _BDBT_set_KeySize_BeforeLast (BDBT_set_KeySize - 8)
-  #define _BDBT_Key_GetBeforeLast _BDBT_set_KeySize_BeforeLast
-
-  #include "rest.h"
-
-  #undef _BDBT_Key_GetBeforeLast
-  #undef _BDBT_set_KeySize_BeforeLast
-  #undef _BDBT_Key_PrepareBeforeLast
-  #undef _BDBT_Key_PassKeySize
-  #undef _BDBT_Key_GetKeySize
-  #undef _BDBT_Key_ParameterKeySize
-#elif defined(BDBT_set_lcpp)
-  #include "cpp.h"
-#endif
-
-#undef BDBT_set_KeySize
+  #include "Traverse.h"
+}

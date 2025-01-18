@@ -3,9 +3,9 @@ typedef BDBT_set_type_node _BDBT_P(NodeReference_t);
 #if BDBT_set_PadNode == 0
   #pragma pack(push, 1)
 #endif
-BDBT_StructBegin(_BDBT_P(Node_t))
-  _BDBT_P(NodeReference_t) n[_BDBT_ElementPerNode];
-BDBT_StructEnd(_BDBT_P(Node_t))
+  BDBT_StructBegin(_BDBT_P(Node_t))
+    _BDBT_P(NodeReference_t) n[_BDBT_ElementPerNode];
+  BDBT_StructEnd(_BDBT_P(Node_t))
 #if BDBT_set_PadNode == 0
   #pragma pack(pop)
 #endif
@@ -14,6 +14,27 @@ BDBT_StructEnd(_BDBT_P(Node_t))
 #define BVEC_set_NodeType BDBT_set_type_node
 #define BVEC_set_NodeData _BDBT_P(Node_t)
 #include <BVEC/BVEC.h>
+
+static uint8_t _BDBT_P(_ReverseKeyByte)(
+  uint8_t p
+){
+  #if BDBT_set_BitPerNode == 1
+    p = (p & 0xf0) >> 4 | (p & 0x0f) << 4;
+    p = (p & 0xcc) >> 2 | (p & 0x33) << 2;
+    p = (p & 0xaa) >> 1 | (p & 0x55) << 1;
+  #elif BDBT_set_BitPerNode == 2
+    p = (p & 0xf0) >> 4 | (p & 0x0f) << 4;
+    p = (p & 0xcc) >> 2 | (p & 0x33) << 2;
+  #elif BDBT_set_BitPerNode == 4
+    p = (p & 0xf0) >> 4 | (p & 0x0f) << 4;
+  #elif BDBT_set_BitPerNode == 8
+    /* ~cheesecake~ */
+  #else
+    #error ?
+  #endif
+
+  return p;
+}
 
 BDBT_StructBegin(_BDBT_P(t))
   _BDBT_P(_NodeList_t) NodeList;
@@ -34,27 +55,6 @@ BDBT_StructBegin(_BDBT_P(t))
   #else
     #error no
   #endif
-
-  _BDBT_fdec(uint8_t, _ReverseKeyByte,
-    uint8_t p
-  ){
-    #if BDBT_set_BitPerNode == 1
-      p = (p & 0xf0) >> 4 | (p & 0x0f) << 4;
-      p = (p & 0xcc) >> 2 | (p & 0x33) << 2;
-      p = (p & 0xaa) >> 1 | (p & 0x55) << 1;
-    #elif BDBT_set_BitPerNode == 2
-      p = (p & 0xf0) >> 4 | (p & 0x0f) << 4;
-      p = (p & 0xcc) >> 2 | (p & 0x33) << 2;
-    #elif BDBT_set_BitPerNode == 4
-      p = (p & 0xf0) >> 4 | (p & 0x0f) << 4;
-    #elif BDBT_set_BitPerNode == 8
-      /* ~cheesecake~ */
-    #else
-      #error ?
-    #endif
-
-    return p;
-  }
 
   /* is node reference invalid */
   _BDBT_fdec(bool, inri,

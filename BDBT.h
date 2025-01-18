@@ -18,6 +18,9 @@
 #ifdef BDBT_set_namespace
   #error outdated setting BDBT_set_namespace. use namespace keyword instead.
 #endif
+#ifdef BDBT_set_base_namespace
+  #error outdated setting BDBT_set_base_namespace. use namespace keyword instead.
+#endif
 
 /* --- outdated --- */
 
@@ -99,9 +102,6 @@
 #undef BDBT_set_PadNode
 #undef BDBT_set_debug_InvalidAction
 #undef BDBT_set_ResizeListAfterClear
-#ifdef BDBT_set_base_namespace
-  #undef BDBT_set_base_namespace
-#endif
 
 #ifdef BDBT_set_lc
   #undef BDBT_set_lc

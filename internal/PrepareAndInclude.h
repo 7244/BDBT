@@ -9,18 +9,19 @@
 #endif
 
 #if defined(BDBT_set_lc)
-  /* keyword prefix */
   #define _BDBT_ip(p) _BDBT_P(p)
   #define _BDBT_bip(p) _BDBT_BP(p)
   #define _BDBT_this This
-  #define _BDBT_fdec(rtype, name, ...) static rtype name(_BDBT_P(t) *This, ##__VA_ARGS__)
-  #define _BDBT_fcall(name, ...) name(This, ##__VA_ARGS__)
+  #define _BDBT_fdec(rtype, name, ...) static rtype _BDBT_P(name)(_BDBT_P(t) *This, ##__VA_ARGS__)
+  #define _BDBT_fcall(name, ...) _BDBT_P(name)(This, ##__VA_ARGS__)
+  #define _BDBT_bfcall(name, ...) _BDBT_BP(name)(tree, ##__VA_ARGS__)
 #elif defined(BDBT_set_lcpp)
   #define _BDBT_ip(p) p
   #define _BDBT_bip(p) CONCAT(BDBT_set_base_prefix,_t)::p
   #define _BDBT_this this
   #define _BDBT_fdec(rtype, name, ...) rtype name(__VA_ARGS__)
   #define _BDBT_fcall(name, ...) name(__VA_ARGS__)
+  #define _BDBT_bfcall(name, ...) tree->name(__VA_ARGS__)
 #else
   #error ?
 #endif
@@ -32,13 +33,15 @@
   #include "Key/Key.h"
 #endif
 
-/* identifier prefix */
-/* base identifier prefix */
+/* ip == identifier prefix */
+/* bip == base identifier prefix */
+
 #undef _BDBT_ip
 #undef _BDBT_bip
 #undef _BDBT_this
 #undef _BDBT_fdec
 #undef _BDBT_fcall
+#undef _BDBT_bfcall
 
 #undef BDBT_StructBegin
 #undef BDBT_StructEnd

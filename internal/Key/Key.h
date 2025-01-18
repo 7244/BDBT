@@ -23,9 +23,29 @@ static void _BDBT_P(Query)(
   _BDBT_P(KeySize_t) KeySize,
   const void *Key,
   _BDBT_P(KeySize_t) *KeyIndex,
-  _BDBT_BP(NodeReference_t) *cnr
+  _BDBT_BP(NodeReference_t) **cnr
 ){
   #include "Query.h"
+}
+
+static void _BDBT_P(QueryNoPointer)(
+  _BDBT_BP(t) *tree,
+  bool BitOrderMatters,
+  _BDBT_P(KeySize_t) KeySize,
+  const void *Key,
+  _BDBT_P(KeySize_t) *KeyIndex,
+  _BDBT_BP(NodeReference_t) *cnr
+){
+  _BDBT_BP(NodeReference_t) *rnr = cnr;
+  _BDBT_P(Query)(
+    tree,
+    BitOrderMatters,
+    KeySize,
+    Key,
+    KeyIndex,
+    &rnr
+  );
+  *cnr = *rnr;
 }
 
 static void _BDBT_P(ConfidentQuery)(

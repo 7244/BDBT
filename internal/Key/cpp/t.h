@@ -2,12 +2,12 @@ gt_begin:
 auto tp = &ta[Current];
 while(
   BitOrder == BitOrderHigh ?
-  tp->k != (KeyNodeIterator_t)-1 :
+  tp->k != (_BDBT_bip(_neit_t))-1 :
   tp->k < _BDBT_ElementPerNode
 ){
   auto Node = list->GetNodeByReference(tp->n);
 
-  KeyNodeIterator_t tk = tp->k;
+  _BDBT_bip(_neit_t) tk = tp->k;
   BitOrder == BitOrderHigh ? --tp->k : ++tp->k;
 
   _BDBT_BP(NodeReference_t) nnr = Node->n[tk];

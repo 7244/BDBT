@@ -53,15 +53,6 @@ struct _BDBT_P(Key_t){
 
   #define BeforeLast (KeySize - 8)
 
-  typedef std::conditional_t<
-    _BDBT_ElementPerNode <= 0xff,
-    uint8_t,
-      std::conditional_t<_BDBT_ElementPerNode <= 0xffff,
-      uint16_t,
-      uint32_t
-    >
-  >KeyNodeIterator_t;
-
   /* add */
   static
   void
@@ -170,7 +161,7 @@ struct _BDBT_P(Key_t){
     KeySize_t Current;
     struct ta_t{
       _BDBT_BP(NodeReference_t) n;
-      KeyNodeIterator_t k;
+      _BDBT_bip(_neit_t) k;
     };
     #if !defined(BDBT_set_KeySize) || defined(BDBT_set_MaxKeySize)
       ta_t ta[MaxKeySize / BDBT_set_BitPerNode];

@@ -1,10 +1,13 @@
 #if defined(BDBT_set_MaxKeySize)
-  _BDBT_P(Remove_InternalDataPerKeyNode_t) idpkn[BDBT_set_MaxKeySize / BDBT_set_BitPerNode];
+  _BDBT_P(Remove_InternalDataPerKeyNode_t) idpkn[(BDBT_set_MaxKeySize) / BDBT_set_BitPerNode];
+#endif
+#if defined(BDBT_set_KeySize)
+  _BDBT_P(Remove_InternalDataPerKeyNode_t) idpkn[(BDBT_set_KeySize) / BDBT_set_BitPerNode];
 #endif
 
 uint8_t *kp8 = (uint8_t *)Key;
 if(BitOrderMatters == true && ENDIAN == 1){
-  kp8 = &((uint8_t *)Key)[KeySize / 8 - 1];
+  kp8 = &((uint8_t *)Key)[_BDBT_KeySize / 8 - 1];
 }
 else{
   kp8 = (uint8_t *)Key;
@@ -13,7 +16,7 @@ else{
 _BDBT_P(KeySize_t) From = 0;
 {
   _BDBT_P(KeySize_t) KeyIndex = 0;
-  while(KeyIndex != KeySize / BDBT_set_BitPerNode){
+  while(KeyIndex != _BDBT_KeySize / BDBT_set_BitPerNode){
     uint8_t Byte = *kp8;
     if(BitOrderMatters == true){
       Byte = _BDBT_BP(_ReverseKeyByte)(Byte);
@@ -51,7 +54,7 @@ _BDBT_P(KeySize_t) From = 0;
   ++From;
 }
 
-for(_BDBT_P(KeySize_t) i = From; i < KeySize / BDBT_set_BitPerNode; i++){
+for(_BDBT_P(KeySize_t) i = From; i < _BDBT_KeySize / BDBT_set_BitPerNode; i++){
   _BDBT_bfcall(Recycle, idpkn[i].tna);
 }
 

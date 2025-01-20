@@ -8,7 +8,9 @@ typedef uintptr_t _BDBT_P(KeySize_t);
 static void _BDBT_P(Add)(
   _BDBT_BP(t) *tree,
   bool BitOrderMatters,
-  _BDBT_P(KeySize_t) KeySize,
+  #if !defined(BDBT_set_KeySize)
+    _BDBT_P(KeySize_t) _BDBT_KeySize,
+  #endif
   const void *Key,
   _BDBT_P(KeySize_t) KeyIndex,
   _BDBT_BP(NodeReference_t) cnr,
@@ -20,7 +22,9 @@ static void _BDBT_P(Add)(
 static void _BDBT_P(Query)(
   _BDBT_BP(t) *tree,
   bool BitOrderMatters,
-  _BDBT_P(KeySize_t) KeySize,
+  #if !defined(BDBT_set_KeySize)
+    _BDBT_P(KeySize_t) _BDBT_KeySize,
+  #endif
   const void *Key,
   _BDBT_P(KeySize_t) *KeyIndex,
   _BDBT_BP(NodeReference_t) **cnr
@@ -31,7 +35,9 @@ static void _BDBT_P(Query)(
 static void _BDBT_P(QueryNoPointer)(
   _BDBT_BP(t) *tree,
   bool BitOrderMatters,
-  _BDBT_P(KeySize_t) KeySize,
+  #if !defined(BDBT_set_KeySize)
+    _BDBT_P(KeySize_t) _BDBT_KeySize,
+  #endif
   const void *Key,
   _BDBT_P(KeySize_t) *KeyIndex,
   _BDBT_BP(NodeReference_t) *cnr
@@ -40,7 +46,9 @@ static void _BDBT_P(QueryNoPointer)(
   _BDBT_P(Query)(
     tree,
     BitOrderMatters,
-    KeySize,
+    #if !defined(BDBT_set_KeySize)
+      _BDBT_KeySize,
+    #endif
     Key,
     KeyIndex,
     &rnr
@@ -51,7 +59,9 @@ static void _BDBT_P(QueryNoPointer)(
 static void _BDBT_P(ConfidentQuery)(
   _BDBT_BP(t) *tree,
   bool BitOrderMatters,
-  _BDBT_P(KeySize_t) KeySize,
+  #if !defined(BDBT_set_KeySize)
+    _BDBT_P(KeySize_t) _BDBT_KeySize,
+  #endif
   const void *Key,
   _BDBT_BP(NodeReference_t) *cnr
 ){
@@ -65,11 +75,13 @@ typedef struct{
 
 static _BDBT_P(KeySize_t) _BDBT_P(Remove)(
   _BDBT_BP(t) *tree,
-  #if !defined(BDBT_set_MaxKeySize)
+  #if !defined(BDBT_set_MaxKeySize) && !defined(BDBT_set_KeySize)
     _BDBT_P(Remove_InternalDataPerKeyNode_t) *idpkn,
   #endif
   bool BitOrderMatters,
-  _BDBT_P(KeySize_t) KeySize,
+  #if !defined(BDBT_set_KeySize)
+    _BDBT_P(KeySize_t) _BDBT_KeySize,
+  #endif
   void *Key,
   _BDBT_BP(NodeReference_t) *cnr
 ){
@@ -86,21 +98,24 @@ typedef struct{
   _BDBT_BP(NodeReference_t) Output;
 
   #if defined(BDBT_set_MaxKeySize)
-    _BDBT_P(Traverse_InternalDataPerKeyNode_t) idpkn[BDBT_set_MaxKeySize / BDBT_set_BitPerNode];
+    _BDBT_P(Traverse_InternalDataPerKeyNode_t) idpkn[(BDBT_set_MaxKeySize) / BDBT_set_BitPerNode];
+  #endif
+  #if defined(BDBT_set_KeySize)
+    _BDBT_P(Traverse_InternalDataPerKeyNode_t) idpkn[(BDBT_set_KeySize) / BDBT_set_BitPerNode];
   #endif
 }_BDBT_P(Traverse_t);
 
 static void _BDBT_P(TraverseInit)(
   _BDBT_P(Traverse_t) *tra,
   _BDBT_P(BitOrder_t) BitOrder,
-  #if !defined(BDBT_set_MaxKeySize)
+  #if !defined(BDBT_set_MaxKeySize) && !defined(BDBT_set_KeySize)
     _BDBT_P(Traverse_InternalDataPerKeyNode_t) *idpkn,
   #endif
   _BDBT_BP(NodeReference_t) rnr
 ){
   tra->Current = 0;
 
-  #if defined(BDBT_set_MaxKeySize)
+  #if defined(BDBT_set_MaxKeySize) || defined(BDBT_set_KeySize)
     _BDBT_P(Traverse_InternalDataPerKeyNode_t) *idpkn = tra->idpkn;
   #endif
 
@@ -111,15 +126,17 @@ static void _BDBT_P(TraverseInit)(
 static bool _BDBT_P(Traverse)(
   _BDBT_BP(t) *tree,
   _BDBT_P(Traverse_t) *tra,
-  #if !defined(BDBT_set_MaxKeySize)
+  #if !defined(BDBT_set_MaxKeySize) && !defined(BDBT_set_KeySize)
     _BDBT_P(Traverse_InternalDataPerKeyNode_t) *idpkn,
   #endif
   bool BitOrderMatters,
   _BDBT_P(BitOrder_t) BitOrder,
-  _BDBT_P(KeySize_t) KeySize,
+  #if !defined(BDBT_set_KeySize)
+    _BDBT_P(KeySize_t) _BDBT_KeySize,
+  #endif
   void *Key
 ){
-  #if defined(BDBT_set_MaxKeySize)
+  #if defined(BDBT_set_MaxKeySize) || defined(BDBT_set_KeySize)
     _BDBT_P(Traverse_InternalDataPerKeyNode_t) *idpkn = tra->idpkn;
   #endif
 

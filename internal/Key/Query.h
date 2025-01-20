@@ -1,12 +1,12 @@
 uint8_t *kp8;
 if(BitOrderMatters == true && ENDIAN == 1){
-  kp8 = &((uint8_t *)Key)[KeySize / 8 - 1];
+  kp8 = &((uint8_t *)Key)[_BDBT_KeySize / 8 - 1];
 }
 else{
   kp8 = (uint8_t *)Key;
 }
 *KeyIndex = 0;
-while(*KeyIndex != KeySize){
+while(*KeyIndex != _BDBT_KeySize){
   uint8_t Byte = *kp8;
   if(BitOrderMatters == true){
     Byte = _BDBT_BP(_ReverseKeyByte)(Byte);

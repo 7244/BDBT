@@ -20,7 +20,7 @@ while(
   _BDBT_P(KeySize_t) d8;
   _BDBT_P(KeySize_t) m8;
   if(BitOrderMatters == true){
-    d8 = (KeySize / 8 - 1) - (tra->Current * BDBT_set_BitPerNode / 8);
+    d8 = (_BDBT_KeySize / 8 - 1) - (tra->Current * BDBT_set_BitPerNode / 8);
     m8 = (8 - BDBT_set_BitPerNode) - tra->Current * BDBT_set_BitPerNode % 8;
   }
   else{
@@ -44,7 +44,7 @@ while(
   ((uint8_t *)Key)[d8] ^= ((uint8_t *)Key)[d8] & _BDBT_ElementPerNode - 1 << m8;
   ((uint8_t *)Key)[d8] |= tk << m8;
 
-  if(tra->Current == KeySize / BDBT_set_BitPerNode - 1){
+  if(tra->Current == _BDBT_KeySize / BDBT_set_BitPerNode - 1){
     tra->Output = nnr;
     return 1;
   }

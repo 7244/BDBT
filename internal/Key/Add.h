@@ -1,8 +1,8 @@
-const uintptr_t BeforeLast = KeySize - 8;
+const uintptr_t BeforeLast = _BDBT_KeySize - 8;
 
 uint8_t *kp8;
 if(BitOrderMatters == true && ENDIAN == 1){
-  kp8 = &((uint8_t *)Key)[KeySize / 8 - 1];
+  kp8 = &((uint8_t *)Key)[_BDBT_KeySize / 8 - 1];
   kp8 -= KeyIndex / 8;
 }
 else{

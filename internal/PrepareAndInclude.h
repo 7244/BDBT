@@ -30,7 +30,13 @@
   #include "rest.h"
 #endif
 #if BDBT_set_declare_Key == 1
+  #if defined(BDBT_set_KeySize)
+    #define _BDBT_KeySize (BDBT_set_KeySize)
+  #endif
   #include "Key/Key.h"
+  #if defined(BDBT_set_KeySize)
+    #undef _BDBT_KeySize
+  #endif
 #endif
 
 /* ip == identifier prefix */

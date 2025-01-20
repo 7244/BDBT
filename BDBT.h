@@ -32,6 +32,10 @@
   #endif
 #endif
 
+#if defined(BDBT_set_KeySize) && defined(BDBT_set_MaxKeySize)
+  #error dont define BDBT_set_MaxKeySize if you define BDBT_set_KeySize
+#endif
+
 #ifndef BDBT_set_AreWeInsideStruct
   #define BDBT_set_AreWeInsideStruct 0
 #endif
@@ -84,6 +88,9 @@
 #undef _BDBT_P
 #undef _BDBT_BP
 
+#ifdef BDBT_set_KeySize
+  #undef BDBT_set_KeySize
+#endif
 #ifdef BDBT_set_MaxKeySize
   #undef BDBT_set_MaxKeySize
 #endif

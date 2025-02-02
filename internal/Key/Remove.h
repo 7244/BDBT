@@ -27,7 +27,7 @@ _BDBT_P(KeySize_t) From = 0;
       idpkn[KeyIndex + i].tka = k;
       _BDBT_BP(Node_t) *Node = _BDBT_bfcall(GetNodeByReference, *cnr);
       *cnr = Node->n[k];
-      for(_BDBT_bip(_neit_t) ki = 0; ki < _BDBT_ElementPerNode; ki++){
+      for(_BDBT_BP(_neit_t) ki = 0; ki < _BDBT_ElementPerNode; ki++){
         if(ki == k){
           continue;
         }

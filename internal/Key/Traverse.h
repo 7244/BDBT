@@ -4,12 +4,12 @@ _BDBT_P(Traverse_InternalDataPerKeyNode_t) *idkn = &idpkn[tra->Current];
 
 while(
   BitOrder == _BDBT_P(BitOrderHigh) ?
-  idkn->k != (_BDBT_bip(_neit_t))-1 :
+  idkn->k != (_BDBT_BP(_neit_t))-1 :
   idkn->k < _BDBT_ElementPerNode
 ){
   _BDBT_BP(Node_t) *Node = _BDBT_bfcall(GetNodeByReference, idkn->n);
 
-  _BDBT_bip(_neit_t) tk = idkn->k;
+  _BDBT_BP(_neit_t) tk = idkn->k;
   BitOrder == _BDBT_P(BitOrderHigh) ? --idkn->k : ++idkn->k;
 
   _BDBT_BP(NodeReference_t) nnr = Node->n[tk];

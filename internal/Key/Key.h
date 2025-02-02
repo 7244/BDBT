@@ -90,7 +90,7 @@ static _BDBT_P(KeySize_t) _BDBT_P(Remove)(
 
 typedef struct{
   _BDBT_BP(NodeReference_t) n;
-  _BDBT_bip(_neit_t) k;
+  _BDBT_BP(_neit_t) k;
 }_BDBT_P(Traverse_InternalDataPerKeyNode_t);
 
 typedef struct{

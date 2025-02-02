@@ -1,5 +1,14 @@
 typedef BDBT_set_type_node _BDBT_P(NodeReference_t);
 
+/* node element iterator */
+#if _BDBT_ElementPerNode <= 0xff
+  typedef uint8_t _BDBT_P(_neit_t);
+#elif _BDBT_ElementPerNode <= 0xffff
+  typedef uint16_t _BDBT_P(_neit_t);
+#else
+  #error no
+#endif
+
 #if BDBT_set_PadNode == 0
   #pragma pack(push, 1)
 #endif
@@ -46,15 +55,6 @@ BDBT_StructBegin(_BDBT_P(t))
 #ifdef BDBT_set_lc
   BDBT_StructEnd(_BDBT_P(t))
 #endif
-
-  /* node element iterator */
-  #if _BDBT_ElementPerNode <= 0xff
-    typedef uint8_t _BDBT_ip(_neit_t);
-  #elif _BDBT_ElementPerNode <= 0xffff
-    typedef uint16_t _BDBT_ip(_neit_t);
-  #else
-    #error no
-  #endif
 
   /* is node reference invalid */
   _BDBT_fdec(bool, inri,
@@ -130,7 +130,7 @@ BDBT_StructBegin(_BDBT_P(t))
 
     {
       _BDBT_P(Node_t) *Node = _BDBT_fcall(_GetNodeByReference, NodeReference);
-      for(_BDBT_ip(_neit_t) i = 0; i < _BDBT_ElementPerNode; i++){
+      for(_BDBT_P(_neit_t) i = 0; i < _BDBT_ElementPerNode; i++){
         Node->n[i] = _BDBT_fcall(gnric);
       }
     }
@@ -150,7 +150,7 @@ BDBT_StructBegin(_BDBT_P(t))
 
     {
       _BDBT_P(Node_t) *Node = _BDBT_fcall(_GetNodeByReference, NodeReference);
-      for(_BDBT_ip(_neit_t) i = 0; i < _BDBT_ElementPerNode; i++){
+      for(_BDBT_P(_neit_t) i = 0; i < _BDBT_ElementPerNode; i++){
         Node->n[i] = BNR[i];
       }
     }
@@ -179,7 +179,7 @@ BDBT_StructBegin(_BDBT_P(t))
     _BDBT_P(NodeReference_t) nr
   ){
     _BDBT_P(Node_t) *n = _BDBT_fcall(GetNodeByReference, nr);
-    for(_BDBT_ip(_neit_t) i = 0; i < _BDBT_ElementPerNode; i++){
+    for(_BDBT_P(_neit_t) i = 0; i < _BDBT_ElementPerNode; i++){
       if(!_BDBT_fcall(inric, n->n[i])){
         return 1;
       }

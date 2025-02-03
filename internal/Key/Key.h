@@ -68,25 +68,30 @@ static void _BDBT_P(ConfidentQuery)(
   #include "ConfidentQuery.h"
 }
 
-typedef struct{
-  _BDBT_BP(NodeReference_t) tna;
-  uint8_t tka;
-}_BDBT_P(Remove_InternalDataPerKeyNode_t);
+#if BDBT_set_Recycle
+  /* TOOOD */
+  /* can we use remove without recycle? */
 
-static _BDBT_P(KeySize_t) _BDBT_P(Remove)(
-  _BDBT_BP(t) *tree,
-  #if !defined(BDBT_set_MaxKeySize) && !defined(BDBT_set_KeySize)
-    _BDBT_P(Remove_InternalDataPerKeyNode_t) *idpkn,
-  #endif
-  bool BitOrderMatters,
-  #if !defined(BDBT_set_KeySize)
-    _BDBT_P(KeySize_t) _BDBT_KeySize,
-  #endif
-  void *Key,
-  _BDBT_BP(NodeReference_t) *cnr
-){
-  #include "Remove.h"
-}
+  typedef struct{
+    _BDBT_BP(NodeReference_t) tna;
+    uint8_t tka;
+  }_BDBT_P(Remove_InternalDataPerKeyNode_t);
+
+  static _BDBT_P(KeySize_t) _BDBT_P(Remove)(
+    _BDBT_BP(t) *tree,
+    #if !defined(BDBT_set_MaxKeySize) && !defined(BDBT_set_KeySize)
+      _BDBT_P(Remove_InternalDataPerKeyNode_t) *idpkn,
+    #endif
+    bool BitOrderMatters,
+    #if !defined(BDBT_set_KeySize)
+      _BDBT_P(KeySize_t) _BDBT_KeySize,
+    #endif
+    void *Key,
+    _BDBT_BP(NodeReference_t) *cnr
+  ){
+    #include "Remove.h"
+  }
+#endif
 
 typedef struct{
   _BDBT_BP(NodeReference_t) n;

@@ -61,6 +61,9 @@
 #ifndef BDBT_set_declare_Key
   #define BDBT_set_declare_Key 1
 #endif
+#ifndef BDBT_set_Recycle
+  #define BDBT_set_Recycle 1
+#endif
 #ifndef BDBT_set_PadNode
   #define BDBT_set_PadNode 0
 #endif
@@ -104,6 +107,7 @@
 #undef BDBT_set_declare_rest
 #undef BDBT_set_UseZeroAsInvalid
 #undef BDBT_set_type_node
+#undef BDBT_set_Recycle
 #undef BDBT_set_PadNode
 #undef BDBT_set_debug_InvalidAction
 #undef BDBT_set_ResizeListAfterClear

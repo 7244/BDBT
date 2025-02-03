@@ -47,10 +47,13 @@ static uint8_t _BDBT_P(_ReverseKeyByte)(
 
 BDBT_StructBegin(_BDBT_P(t))
   _BDBT_P(_NodeList_t) NodeList;
-  struct{
-    _BDBT_P(NodeReference_t) c;
-    _BDBT_P(NodeReference_t) p;
-  }e;
+
+  #if BDBT_set_Recycle
+    struct{
+      _BDBT_P(NodeReference_t) c;
+      _BDBT_P(NodeReference_t) p;
+    }e;
+  #endif
 
 #ifdef BDBT_set_lc
   BDBT_StructEnd(_BDBT_P(t))
@@ -103,16 +106,22 @@ BDBT_StructBegin(_BDBT_P(t))
 
   _BDBT_fdec(_BDBT_P(NodeReference_t), usage
   ){
-    return _BDBT_this->NodeList.Current - _BDBT_this->e.p;
+    return _BDBT_this->NodeList.Current
+      #if BDBT_set_Recycle
+        - _BDBT_this->e.p
+      #endif
+    ;
   }
 
-  _BDBT_fdec(_BDBT_P(NodeReference_t), NewNode_empty
-  ){
-    _BDBT_P(NodeReference_t) NodeReference = _BDBT_this->e.c;
-    _BDBT_this->e.c = _BDBT_fcall(_GetNodeByReference, NodeReference)->n[0];
-    _BDBT_this->e.p--;
-    return NodeReference;
-  }
+  #if BDBT_set_Recycle
+    _BDBT_fdec(_BDBT_P(NodeReference_t), NewNode_empty
+    ){
+      _BDBT_P(NodeReference_t) NodeReference = _BDBT_this->e.c;
+      _BDBT_this->e.c = _BDBT_fcall(_GetNodeByReference, NodeReference)->n[0];
+      _BDBT_this->e.p--;
+      return NodeReference;
+    }
+  #endif
   _BDBT_fdec(_BDBT_P(NodeReference_t), NewNode_alloc
   ){
     _BDBT_P(_NodeList_AddEmpty)(&_BDBT_this->NodeList, 1);
@@ -121,9 +130,12 @@ BDBT_StructBegin(_BDBT_P(t))
   _BDBT_fdec(_BDBT_P(NodeReference_t), NewNode
   ){
     _BDBT_P(NodeReference_t) NodeReference;
-    if(_BDBT_this->e.p){
-      NodeReference = _BDBT_fcall(NewNode_empty);
-    }
+    if(0);
+    #if BDBT_set_Recycle
+      else if(_BDBT_this->e.p){
+        NodeReference = _BDBT_fcall(NewNode_empty);
+      }
+    #endif
     else{
       NodeReference = _BDBT_fcall(NewNode_alloc);
     }
@@ -141,9 +153,12 @@ BDBT_StructBegin(_BDBT_P(t))
     _BDBT_P(NodeReference_t) *BNR /* branch node references */
   ){
     _BDBT_P(NodeReference_t) NodeReference;
-    if(_BDBT_this->e.p){
-      NodeReference = _BDBT_fcall(NewNode_empty);
-    }
+    if(0);
+    #if BDBT_set_Recycle
+      else if(_BDBT_this->e.p){
+        NodeReference = _BDBT_fcall(NewNode_empty);
+      }
+    #endif
     else{
       NodeReference = _BDBT_fcall(NewNode_alloc);
     }
@@ -158,15 +173,17 @@ BDBT_StructBegin(_BDBT_P(t))
     return NodeReference;
   }
 
-  _BDBT_fdec(void, Recycle,
-    _BDBT_P(NodeReference_t) NodeReference
-  ){
-    _BDBT_P(Node_t) *Node = _BDBT_fcall(GetNodeByReference, NodeReference);
+  #if BDBT_set_Recycle
+    _BDBT_fdec(void, Recycle,
+      _BDBT_P(NodeReference_t) NodeReference
+    ){
+      _BDBT_P(Node_t) *Node = _BDBT_fcall(GetNodeByReference, NodeReference);
 
-    Node->n[0] = _BDBT_this->e.c;
-    _BDBT_this->e.c = NodeReference;
-    _BDBT_this->e.p++;
-  }
+      Node->n[0] = _BDBT_this->e.c;
+      _BDBT_this->e.c = NodeReference;
+      _BDBT_this->e.p++;
+    }
+  #endif
 
   _BDBT_fdec(void, PreAllocateNodes,
     _BDBT_P(NodeReference_t) Amount
@@ -189,7 +206,10 @@ BDBT_StructBegin(_BDBT_P(t))
 
   _BDBT_fdec(void, _AfterInitNodes
   ){
-    _BDBT_this->e.p = 0;
+    #if BDBT_set_Recycle
+      _BDBT_this->e.p = 0;
+    #endif
+
     #if BDBT_set_UseZeroAsInvalid == 1
       /* reserved */
       _BDBT_P(_NodeList_AddEmpty)(&_BDBT_this->NodeList, 1);

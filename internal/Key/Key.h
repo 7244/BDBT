@@ -56,6 +56,30 @@ static void _BDBT_P(QueryNoPointer)(
   *cnr = *rnr;
 }
 
+#if BDBT_set_MultiThread
+  typedef _BDBT_BP(_FastLock_t) _BDBT_P(QueryLock_t);
+
+  static _BDBT_P(QueryLock_t) *_BDBT_P(QueryAndLock)(
+    _BDBT_BP(t) *tree,
+    bool BitOrderMatters,
+    #if !defined(BDBT_set_KeySize)
+      _BDBT_P(KeySize_t) _BDBT_KeySize,
+    #endif
+    const void *Key,
+    _BDBT_P(KeySize_t) *KeyIndex,
+    _BDBT_BP(NodeReference_t) **cnr
+  ){
+    #include "QueryAndLock.h"
+  }
+
+  static void _BDBT_P(UnlockQuery)(
+    _BDBT_BP(t) *tree,
+    _BDBT_P(QueryLock_t) *lock
+  ){
+    _BDBT_BP(_FastLock_Unlock)(lock);
+  }
+#endif
+
 static void _BDBT_P(ConfidentQuery)(
   _BDBT_BP(t) *tree,
   bool BitOrderMatters,

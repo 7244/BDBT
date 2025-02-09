@@ -67,9 +67,6 @@
 #ifndef BDBT_set_PadNode
   #define BDBT_set_PadNode 0
 #endif
-#ifndef BDBT_set_debug_InvalidAction
-  #define BDBT_set_debug_InvalidAction 0
-#endif
 #ifndef BDBT_set_ResizeListAfterClear
   #define BDBT_set_ResizeListAfterClear 0
 #endif
@@ -81,6 +78,42 @@
 #endif
 #ifndef BDBT_set_BitPerNode
   #define BDBT_set_BitPerNode 2
+#endif
+#ifndef BDBT_set_MultiThread
+  #define BDBT_set_MultiThread 0
+#endif
+#ifndef BDBT_set_CountLockFail
+  #define BDBT_set_CountLockFail 0
+#endif
+
+#ifndef BDBT_set_alloc_open
+  #if defined(__generic_malloc)
+    #define BDBT_set_alloc_open __generic_malloc
+  #else
+    #define BDBT_set_alloc_open malloc
+  #endif
+#endif
+#ifndef BDBT_set_alloc_resize
+  #if defined(__generic_realloc)
+    #define BDBT_set_alloc_resize __generic_realloc
+  #else
+    #define BDBT_set_alloc_resize realloc
+  #endif
+#endif
+#ifndef BDBT_set_alloc_close
+  #if defined(__generic_free)
+    #define BDBT_set_alloc_close __generic_free
+  #else
+    #define BDBT_set_alloc_close free
+  #endif
+#endif
+
+#ifndef BDBT_set_StoreFormat
+  #if BDBT_set_MultiThread
+    #define BDBT_set_StoreFormat 1
+  #else
+    #define BDBT_set_StoreFormat 0
+  #endif
 #endif
 
 #define _BDBT_BP(p0) CONCAT3(BDBT_set_base_prefix, _, p0)
@@ -97,6 +130,17 @@
 #ifdef BDBT_set_MaxKeySize
   #undef BDBT_set_MaxKeySize
 #endif
+
+#undef BDBT_set_alloc_close
+#undef BDBT_set_alloc_resize
+#undef BDBT_set_alloc_open
+
+#undef BDBT_set_StoreFormat
+#ifdef BDBT_set_CountLockFailGlobal
+  #undef BDBT_set_CountLockFailGlobal
+#endif
+#undef BDBT_set_CountLockFail
+#undef BDBT_set_MultiThread
 #undef BDBT_set_BitPerNode
 #ifdef BDBT_set_CPP_ConstructDestruct
   #undef BDBT_set_CPP_ConstructDestruct
@@ -109,7 +153,6 @@
 #undef BDBT_set_type_node
 #undef BDBT_set_Recycle
 #undef BDBT_set_PadNode
-#undef BDBT_set_debug_InvalidAction
 #undef BDBT_set_ResizeListAfterClear
 
 #ifdef BDBT_set_lc

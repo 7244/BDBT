@@ -55,10 +55,18 @@ typedef BDBT_set_type_node _BDBT_P(NodeReference_t);
   #pragma pack(pop)
 #endif
 
-#define BVEC_set_prefix _BDBT_P(_NodeList)
-#define BVEC_set_NodeType BDBT_set_type_node
-#define BVEC_set_NodeData _BDBT_P(Node_t)
-#include <BVEC/BVEC.h>
+#if BDBT_set_StoreFormat == 0
+  #define BVEC_set_prefix _BDBT_P(_NodeList)
+  #define BVEC_set_NodeType BDBT_set_type_node
+  #define BVEC_set_NodeData _BDBT_P(Node_t)
+  #include <BVEC/BVEC.h>
+#elif BDBT_set_StoreFormat == 1
+  static _BDBT_P(Node_t) *_BDBT_P(_StoreFormat1_AllocateNodeList)(uint8_t NodeList){
+    return (_BDBT_P(Node_t) *)BDBT_set_alloc_open(((uintptr_t)1 << NodeList) * sizeof(_BDBT_P(Node_t)));
+  }
+#else
+  #error ?
+#endif
 
 static uint8_t _BDBT_P(_ReverseKeyByte)(
   uint8_t p
@@ -83,13 +91,25 @@ static uint8_t _BDBT_P(_ReverseKeyByte)(
 
 BDBT_StructBegin(_BDBT_P(t))
   #if BDBT_set_StoreFormat == 0
+    #if BDBT_set_RuntimePreallocate
+      #error not gonna be implemented
+    #endif
+
     _BDBT_P(_NodeList_t) NodeList;
   #elif BDBT_set_StoreFormat == 1
     _BDBT_BP(Node_t) *NodeLists[(uintptr_t)1 << __compile_time_log2(sizeof(_BDBT_P(NodeReference_t)) * 8)];
     BDBT_set_type_node Current;
 
-    #if BDBT_set_MultiThread
-      _BDBT_BP(_FastLock_t) NodeListsLocks[(uintptr_t)1 << __compile_time_log2(sizeof(_BDBT_P(NodeReference_t)) * 8)];
+    #if BDBT_set_RuntimePreallocate
+      BDBT_set_type_node Possible;
+
+      #if BDBT_set_MultiThread
+        _BDBT_BP(_FastLock_t) AllocateLock;
+      #endif
+    #else
+      #if BDBT_set_MultiThread
+        _BDBT_BP(_FastLock_t) NodeListsLocks[(uintptr_t)1 << __compile_time_log2(sizeof(_BDBT_P(NodeReference_t)) * 8)];
+      #endif
     #endif
   #else
     #error ?
@@ -217,6 +237,9 @@ BDBT_StructBegin(_BDBT_P(t))
       #if BDBT_set_MultiThread
         #error not gonna be implemented
       #endif
+      #if BDBT_set_RuntimePreallocate
+        #error not gonna be implemented
+      #endif
 
       _BDBT_P(_NodeList_AddEmpty)(&_BDBT_this->NodeList, 1);
 
@@ -225,28 +248,62 @@ BDBT_StructBegin(_BDBT_P(t))
       return ret;
     #elif BDBT_set_StoreFormat == 1
       #if !BDBT_set_MultiThread
+        #if BDBT_set_RuntimePreallocate
+          #error not gonna be implemented
+        #endif
+
         BDBT_set_type_node node_id = _BDBT_this->Current++;
         uint8_t NodeList = _BDBT_P(_GetNodeListByNodeID)(node_id);
         if(_BDBT_this->NodeLists[NodeList] == NULL){
-          _BDBT_this->NodeLists[NodeList] =
-            (_BDBT_P(Node_t) *)BDBT_set_alloc_open(((uintptr_t)1 << NodeList) * sizeof(_BDBT_P(Node_t)));
+          _BDBT_this->NodeLists[NodeList] = _BDBT_P(_StoreFormat1_AllocateNodeList)(NodeList);
         }
         return node_id;
       #else
-        BDBT_set_type_node node_id = __atomic_fetch_add(&_BDBT_this->Current, 1, __ATOMIC_SEQ_CST);
-        uint8_t NodeList = _BDBT_P(_GetNodeListByNodeID)(node_id);
-        if(__atomic_load_n(&_BDBT_this->NodeLists[NodeList], __ATOMIC_RELAXED) == NULL){
-          while(_BDBT_P(_FastLock_Lock)(&_BDBT_this->NodeListsLocks[NodeList])){ /* TOOD cpu relax */ }
-          if(__atomic_load_n(&_BDBT_this->NodeLists[NodeList], __ATOMIC_SEQ_CST) == NULL){
-            __atomic_exchange_n(
-              &_BDBT_this->NodeLists[NodeList],
-              BDBT_set_alloc_open(((uintptr_t)1 << NodeList) * sizeof(_BDBT_P(Node_t))),
-              __ATOMIC_SEQ_CST
-            );
+        #if BDBT_set_RuntimePreallocate
+          BDBT_set_type_node node_id = __atomic_fetch_add(&_BDBT_this->Current, 1, __ATOMIC_SEQ_CST);
+          BDBT_set_type_node p = __atomic_load_n(&_BDBT_this->Possible, __ATOMIC_RELAXED);
+          if(node_id + 0xc00 >= p){
+            while(1){
+              if(_BDBT_P(_FastLock_LockDontCountFail)(&_BDBT_this->AllocateLock)){
+                p = __atomic_load_n(&_BDBT_this->Possible, __ATOMIC_SEQ_CST);
+                if(node_id < p){
+                  break;
+                }
+                _BDBT_P(_FastLock_CountFail)(&_BDBT_this->AllocateLock);
+                continue;
+              }
+              BDBT_set_type_node c = node_id;
+              while(c + 0xc00 >= _BDBT_this->Possible){
+                uint8_t NodeList = _BDBT_P(_GetNodeListByNodeID)(_BDBT_this->Possible);
+                __atomic_exchange_n(
+                  &_BDBT_this->NodeLists[NodeList],
+                  _BDBT_P(_StoreFormat1_AllocateNodeList)(NodeList),
+                  __ATOMIC_SEQ_CST
+                );
+                __atomic_exchange_n(&_BDBT_this->Possible, _BDBT_this->Possible << 1, __ATOMIC_RELAXED);
+                c = __atomic_load_n(&_BDBT_this->Current, __ATOMIC_RELAXED);
+              }
+              _BDBT_P(_FastLock_Unlock)(&_BDBT_this->AllocateLock);
+              break;
+            }
           }
-          _BDBT_P(_FastLock_Unlock)(&_BDBT_this->NodeListsLocks[NodeList]);
-        }
-        return node_id;
+          return node_id;
+        #else
+          BDBT_set_type_node node_id = __atomic_fetch_add(&_BDBT_this->Current, 1, __ATOMIC_SEQ_CST);
+          uint8_t NodeList = _BDBT_P(_GetNodeListByNodeID)(node_id);
+          if(__atomic_load_n(&_BDBT_this->NodeLists[NodeList], __ATOMIC_RELAXED) == NULL){
+            while(_BDBT_P(_FastLock_Lock)(&_BDBT_this->NodeListsLocks[NodeList])){ /* TOOD cpu relax */ }
+            if(__atomic_load_n(&_BDBT_this->NodeLists[NodeList], __ATOMIC_SEQ_CST) == NULL){
+              __atomic_exchange_n(
+                &_BDBT_this->NodeLists[NodeList],
+                _BDBT_P(_StoreFormat1_AllocateNodeList)(NodeList),
+                __ATOMIC_SEQ_CST
+              );
+            }
+            _BDBT_P(_FastLock_Unlock)(&_BDBT_this->NodeListsLocks[NodeList]);
+          }
+          return node_id;
+        #endif
       #endif
     #else
       #error ?
@@ -322,26 +379,29 @@ BDBT_StructBegin(_BDBT_P(t))
     #if BDBT_set_StoreFormat == 0
       _BDBT_P(_NodeList_Reserve)(&_BDBT_this->NodeList, Amount);
     #elif BDBT_set_StoreFormat == 1
-      _BDBT_P(NodeReference_t) NodeList = 0;
-      _BDBT_P(NodeReference_t) NodeListTo = _BDBT_P(_GetNodeListByNodeID)(Amount) + 1;
-      for(; NodeList < NodeListTo; NodeList++){
-        #if !BDBT_set_MultiThread
-          if(_BDBT_this->NodeLists[NodeList] == NULL){
-            _BDBT_this->NodeLists[NodeList] =
-              (_BDBT_P(Node_t) *)BDBT_set_alloc_open(((uintptr_t)1 << NodeList) * sizeof(_BDBT_P(Node_t)));
-          }
-        #else
-          while(_BDBT_P(_FastLock_Lock)(&_BDBT_this->NodeListsLocks[NodeList])){ /* TOOD cpu relax */ }
-          if(__atomic_load_n(&_BDBT_this->NodeLists[NodeList], __ATOMIC_SEQ_CST) == NULL){
-            __atomic_exchange_n(
-              &_BDBT_this->NodeLists[NodeList],
-              BDBT_set_alloc_open(((uintptr_t)1 << NodeList) * sizeof(_BDBT_P(Node_t))),
-              __ATOMIC_SEQ_CST
-            );
-          }
-          _BDBT_P(_FastLock_Unlock)(&_BDBT_this->NodeListsLocks[NodeList]);
-        #endif
-      }
+      #if BDBT_set_RuntimePreallocate
+        __abort();
+      #else
+        _BDBT_P(NodeReference_t) NodeList = 0;
+        _BDBT_P(NodeReference_t) NodeListTo = _BDBT_P(_GetNodeListByNodeID)(Amount) + 1;
+        for(; NodeList < NodeListTo; NodeList++){
+          #if !BDBT_set_MultiThread
+            if(_BDBT_this->NodeLists[NodeList] == NULL){
+              _BDBT_this->NodeLists[NodeList] = _BDBT_P(_StoreFormat1_AllocateNodeList)(NodeList);
+            }
+          #else
+            while(_BDBT_P(_FastLock_Lock)(&_BDBT_this->NodeListsLocks[NodeList])){ /* TOOD cpu relax */ }
+            if(__atomic_load_n(&_BDBT_this->NodeLists[NodeList], __ATOMIC_SEQ_CST) == NULL){
+              __atomic_exchange_n(
+                &_BDBT_this->NodeLists[NodeList],
+                _BDBT_P(_StoreFormat1_AllocateNodeList)(NodeList),
+                __ATOMIC_SEQ_CST
+              );
+            }
+            _BDBT_P(_FastLock_Unlock)(&_BDBT_this->NodeListsLocks[NodeList]);
+          #endif
+        }
+      #endif
     #else
       #error ?
     #endif
@@ -395,11 +455,23 @@ BDBT_StructBegin(_BDBT_P(t))
         i--;
       ){
         _BDBT_this->NodeLists[i] = NULL;
-
-        #if BDBT_set_MultiThread
-          _BDBT_P(_FastLock_Init)(&_BDBT_this->NodeListsLocks[i]);
-        #endif
       }
+
+      #if BDBT_set_RuntimePreallocate
+        _BDBT_this->Possible = _BDBT_fcall(WhatRootWouldBe);
+        #if BDBT_set_MultiThread
+          _BDBT_P(_FastLock_Init)(&_BDBT_this->AllocateLock);
+        #endif
+      #else
+        #if BDBT_set_MultiThread
+          for(
+            uintptr_t i = (uintptr_t)1 << __compile_time_log2(sizeof(_BDBT_P(NodeReference_t)) * 8);
+            i--;
+          ){
+            _BDBT_P(_FastLock_Init)(&_BDBT_this->NodeListsLocks[i]);
+          }
+        #endif
+      #endif
     #else
       #error ?
     #endif

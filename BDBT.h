@@ -116,6 +116,14 @@
   #endif
 #endif
 
+#ifndef BDBT_set_RuntimePreallocate
+  #if !BDBT_set_MultiThread
+    #define BDBT_set_RuntimePreallocate 0
+  #else
+    #define BDBT_set_RuntimePreallocate 1
+  #endif
+#endif
+
 #define _BDBT_BP(p0) CONCAT3(BDBT_set_base_prefix, _, p0)
 #define _BDBT_P(p0) CONCAT3(BDBT_set_prefix, _, p0)
 
@@ -135,6 +143,7 @@
 #undef BDBT_set_alloc_resize
 #undef BDBT_set_alloc_open
 
+#undef BDBT_set_RuntimePreallocate
 #undef BDBT_set_StoreFormat
 #ifdef BDBT_set_CountLockFailGlobal
   #undef BDBT_set_CountLockFailGlobal

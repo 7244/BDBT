@@ -107,6 +107,10 @@ BDBT_StructBegin(_BDBT_P(t))
         _BDBT_BP(_FastLock_t) AllocateLock;
       #endif
     #else
+      #if BDBT_set_PreserveSome
+        #error please no
+      #endif
+
       #if BDBT_set_MultiThread
         _BDBT_BP(_FastLock_t) NodeListsLocks[(uintptr_t)1 << __compile_time_log2(sizeof(_BDBT_P(NodeReference_t)) * 8)];
       #endif
@@ -192,6 +196,7 @@ BDBT_StructBegin(_BDBT_P(t))
     #endif
   }
 
+  /* TODO check WhatRootWouldBe */
   _BDBT_fdec(_BDBT_P(NodeReference_t), usage
   ){
     return
@@ -211,9 +216,19 @@ BDBT_StructBegin(_BDBT_P(t))
   _BDBT_fdec(__forceinline _BDBT_P(NodeReference_t), WhatRootWouldBe
   ){
     #if BDBT_set_StoreFormat == 0
+      #if BDBT_set_PreserveSome
+        #error no
+      #endif
+
       return 0;
     #elif BDBT_set_StoreFormat == 1
-      return 1;
+      #if BDBT_set_PreserveSome
+        /* 0x1000 is smallest page size in i386. make it dynamic in compile time */
+        /* it should care smallest or optimal allocation, not page size */
+        return 0x1000 / (BDBT_set_BitPerNode * sizeof(BDBT_set_type_node));
+      #else
+        return 1;
+      #endif
     #else
       #error ?
     #endif
@@ -251,6 +266,9 @@ BDBT_StructBegin(_BDBT_P(t))
         #if BDBT_set_RuntimePreallocate
           #error not gonna be implemented
         #endif
+        #if BDBT_set_PreserveSome
+          #error not gonna be implemented
+        #endif
 
         BDBT_set_type_node node_id = _BDBT_this->Current++;
         uint8_t NodeList = _BDBT_P(_GetNodeListByNodeID)(node_id);
@@ -262,19 +280,19 @@ BDBT_StructBegin(_BDBT_P(t))
         #if BDBT_set_RuntimePreallocate
           BDBT_set_type_node node_id = __atomic_fetch_add(&_BDBT_this->Current, 1, __ATOMIC_SEQ_CST);
           BDBT_set_type_node p = __atomic_load_n(&_BDBT_this->Possible, __ATOMIC_RELAXED);
-          if(node_id + 0xc00 >= p){
+          if(node_id + 0xc00 * !BDBT_set_PreserveSome >= p){
             while(1){
               if(_BDBT_P(_FastLock_LockDontCountFail)(&_BDBT_this->AllocateLock)){
                 p = __atomic_load_n(&_BDBT_this->Possible, __ATOMIC_SEQ_CST);
-                if(node_id < p){
+                if(node_id < p << !!BDBT_set_PreserveSome){
                   break;
                 }
                 _BDBT_P(_FastLock_CountFail)(&_BDBT_this->AllocateLock);
                 continue;
               }
               BDBT_set_type_node c = node_id;
-              while(c + 0xc00 >= _BDBT_this->Possible){
-                uint8_t NodeList = _BDBT_P(_GetNodeListByNodeID)(_BDBT_this->Possible);
+              while(c + 0xc00 * !BDBT_set_PreserveSome >= _BDBT_this->Possible){
+                uint8_t NodeList = _BDBT_P(_GetNodeListByNodeID)(_BDBT_this->Possible << !!BDBT_set_PreserveSome);
                 __atomic_exchange_n(
                   &_BDBT_this->NodeLists[NodeList],
                   _BDBT_P(_StoreFormat1_AllocateNodeList)(NodeList),
@@ -289,6 +307,10 @@ BDBT_StructBegin(_BDBT_P(t))
           }
           return node_id;
         #else
+          #if BDBT_set_PreserveSome
+            #error not gonna be implemented
+          #endif
+
           BDBT_set_type_node node_id = __atomic_fetch_add(&_BDBT_this->Current, 1, __ATOMIC_SEQ_CST);
           uint8_t NodeList = _BDBT_P(_GetNodeListByNodeID)(node_id);
           if(__atomic_load_n(&_BDBT_this->NodeLists[NodeList], __ATOMIC_RELAXED) == NULL){
@@ -458,7 +480,12 @@ BDBT_StructBegin(_BDBT_P(t))
       }
 
       #if BDBT_set_RuntimePreallocate
-        _BDBT_this->Possible = _BDBT_fcall(WhatRootWouldBe);
+        #if BDBT_set_PreserveSome
+          _BDBT_this->Possible = _BDBT_fcall(WhatRootWouldBe) >> 1;
+        #else
+          _BDBT_this->Possible = _BDBT_fcall(WhatRootWouldBe);
+        #endif
+
         #if BDBT_set_MultiThread
           _BDBT_P(_FastLock_Init)(&_BDBT_this->AllocateLock);
         #endif

@@ -56,10 +56,10 @@ typedef BDBT_set_type_node _BDBT_P(NodeReference_t);
 #endif
 
 #if BDBT_set_StoreFormat == 0
-  #define BVEC_set_prefix _BDBT_P(_NodeList)
-  #define BVEC_set_NodeType BDBT_set_type_node
-  #define BVEC_set_NodeData _BDBT_P(Node_t)
-  #include <BVEC/BVEC.h>
+  #define bcontainer_set_Prefix _BDBT_P(_NodeList)
+  #define bcontainer_set_NodeType BDBT_set_type_node
+  #define bcontainer_set_NodeData _BDBT_P(Node_t)
+  #include <bcontainer/bcontainer.h>
 #elif BDBT_set_StoreFormat == 1
   static _BDBT_P(Node_t) *_BDBT_P(_StoreFormat1_AllocateNodeList)(uint8_t NodeList){
     return (_BDBT_P(Node_t) *)BDBT_set_alloc_open(((uintptr_t)1 << NodeList) * sizeof(_BDBT_P(Node_t)));

@@ -75,13 +75,7 @@ BDBT_StructBegin(_BDBT_P(t))
   /* get node reference invalid constant */
   _BDBT_fdec(_BDBT_P(NodeReference_t), gnric
   ){
-    return (_BDBT_P(NodeReference_t))
-      #if BDBT_set_UseZeroAsInvalid == 0
-        -1
-      #else
-        0
-      #endif
-    ;
+    return (_BDBT_P(NodeReference_t))-1;
   }
 
   /* is node reference invalid constant */
@@ -97,7 +91,6 @@ BDBT_StructBegin(_BDBT_P(t))
     return _BDBT_P(_NodeList_GetNode)(&_BDBT_this->NodeList, node_id);
   }
 
-  /* TODO check WhatRootWouldBe */
   __forceinline
   _BDBT_fdec(_BDBT_P(NodeReference_t), Usage
   ){
@@ -128,14 +121,12 @@ BDBT_StructBegin(_BDBT_P(t))
   ){
     _BDBT_P(NodeReference_t) node_id = _BDBT_P(_NodeList_NewNode)(&_BDBT_this->NodeList);
 
-    {
-      _BDBT_P(Node_t) *Node = _BDBT_fcall(GetNodeByReference, node_id);
-      for(_BDBT_P(_neit_t) i = 0; i < _BDBT_ElementPerNode; i++){
-        Node->n[i] = BNR[i];
-        #if BDBT_set_MultiThread
-          _BDBT_BP(_FastLock_Init)(&Node->locks[i]);
-        #endif
-      }
+    _BDBT_P(Node_t) *Node = _BDBT_fcall(GetNodeByReference, node_id);
+    for(_BDBT_P(_neit_t) i = 0; i < _BDBT_ElementPerNode; i++){
+      Node->n[i] = BNR[i];
+      #if BDBT_set_MultiThread
+        _BDBT_BP(_FastLock_Init)(&Node->locks[i]);
+      #endif
     }
 
     return node_id;
@@ -162,18 +153,9 @@ BDBT_StructBegin(_BDBT_P(t))
     return 0;
   }
 
-  _BDBT_fdec(void, _AfterInitNodes
-  ){
-    #if BDBT_set_UseZeroAsInvalid == 1
-      #error should check BDBT_set_StoreFormat
-    #endif
-  }
-
   _BDBT_fdec(void, Open
   ){
     _BDBT_P(_NodeList_Open)(&_BDBT_this->NodeList);
-
-    _BDBT_fcall(_AfterInitNodes);
   }
   _BDBT_fdec(void, Close
   ){
@@ -181,23 +163,7 @@ BDBT_StructBegin(_BDBT_P(t))
   }
   _BDBT_fdec(void, Clear
   ){
-    #if BDBT_set_StoreFormat == 0
-      #if BDBT_set_ResizeListAfterClear == 1
-        #error implement this
-      #else
-        _BDBT_P(_NodeList_Clear)(&_BDBT_this->NodeList);
-      #endif
-    #elif BDBT_set_StoreFormat == 1
-      #if BDBT_set_ResizeListAfterClear == 1
-        #error implement this
-      #else
-        _BDBT_this->Current = _BDBT_fcall(WhatRootWouldBe);
-      #endif
-    #else
-      #error ?
-    #endif
-
-    _BDBT_fcall(_AfterInitNodes);
+    _BDBT_P(_NodeList_Clear)(&_BDBT_this->NodeList);
   }
 
   #ifdef BDBT_set_CPP_ConstructDestruct

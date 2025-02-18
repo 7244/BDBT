@@ -39,3 +39,7 @@
 #ifdef BDBT_set_PreserveSome
   #error outdated setting. now its handled by bcontainer.
 #endif
+
+#ifdef BDBT_set_UseZeroAsInvalid
+  #error will be implemented later
+#endif

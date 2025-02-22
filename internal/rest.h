@@ -34,7 +34,11 @@ typedef BDBT_set_type_node _BDBT_P(NodeReference_t);
 #endif
 
 #define bcontainer_set_Prefix _BDBT_P(_NodeList)
-#define bcontainer_set_NodeType BDBT_set_type_node
+#if BDBT_set_PointerNodeID
+  #define bcontainer_set_PointerNodeType BDBT_set_PointerNodeID
+#else
+  #define bcontainer_set_NodeType BDBT_set_type_node
+#endif
 #define bcontainer_set_NodeData _BDBT_P(Node_t)
 #define bcontainer_set_Recycle BDBT_set_Recycle
 #define bcontainer_set_MultiThread BDBT_set_MultiThread

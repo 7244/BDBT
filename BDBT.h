@@ -46,8 +46,19 @@
 #ifndef BDBT_set_ResizeListAfterClear
   #define BDBT_set_ResizeListAfterClear 0
 #endif
+#ifndef BDBT_set_PointerNodeID
+  #define BDBT_set_PointerNodeID 0
+#endif
 #ifndef BDBT_set_type_node
-  #define BDBT_set_type_node uint32_t
+  #if BDBT_set_PointerNodeID
+    #define BDBT_set_type_node uintptr_t
+  #else
+    #define BDBT_set_type_node uint32_t
+  #endif
+#else
+  #if BDBT_set_PointerNodeID
+    #error dont define BDBT_set_type_node
+  #endif
 #endif
 #ifndef BDBT_set_BitPerNode
   #define BDBT_set_BitPerNode 2
@@ -98,6 +109,7 @@
 #undef BDBT_set_declare_Key
 #undef BDBT_set_declare_rest
 #undef BDBT_set_type_node
+#undef BDBT_set_PointerNodeID
 #undef BDBT_set_Recycle
 #undef BDBT_set_PadNode
 #undef BDBT_set_ResizeListAfterClear

@@ -92,7 +92,7 @@ BDBT_StructBegin(_BDBT_P(t))
   _BDBT_fdec(_BDBT_P(Node_t) *, GetNodeByReference,
     _BDBT_P(NodeReference_t) node_id
   ){
-    return _BDBT_P(_NodeList_GetNode)(&_BDBT_this->NodeList, node_id);
+    return _BDBT_P(_NodeList_GetNode)(&_BDBT_this->NodeList, (_BDBT_WrappedID_t)node_id);
   }
 
   __forceinline
@@ -106,11 +106,11 @@ BDBT_StructBegin(_BDBT_P(t))
     return _BDBT_P(_NodeList_WhatFirstWouldBe)(&_BDBT_this->NodeList);
   }
 
-  _BDBT_fdec(_BDBT_P(NodeReference_t), NewNode
+  _BDBT_fdec(_BDBT_WrappedID_t, NewNode
   ){
-    _BDBT_P(NodeReference_t) node_id = _BDBT_P(_NodeList_NewNode)(&_BDBT_this->NodeList);
+    _BDBT_WrappedID_t node_id = _BDBT_P(_NodeList_NewNode)(&_BDBT_this->NodeList);
 
-    _BDBT_P(Node_t) *Node = _BDBT_fcall(GetNodeByReference, node_id);
+    _BDBT_P(Node_t) *Node = _BDBT_fcall(GetNodeByReference, (_BDBT_P(NodeReference_t))node_id);
     for(_BDBT_P(_neit_t) i = 0; i < _BDBT_ElementPerNode; i++){
       Node->n[i] = _BDBT_fcall(gnric);
       #if BDBT_set_MultiThread
@@ -123,9 +123,9 @@ BDBT_StructBegin(_BDBT_P(t))
   _BDBT_fdec(_BDBT_P(NodeReference_t), NewNodeBranchly,
     _BDBT_P(NodeReference_t) *BNR /* branch node references */
   ){
-    _BDBT_P(NodeReference_t) node_id = _BDBT_P(_NodeList_NewNode)(&_BDBT_this->NodeList);
+    _BDBT_WrappedID_t node_id = _BDBT_P(_NodeList_NewNode)(&_BDBT_this->NodeList);
 
-    _BDBT_P(Node_t) *Node = _BDBT_fcall(GetNodeByReference, node_id);
+    _BDBT_P(Node_t) *Node = _BDBT_fcall(GetNodeByReference, (_BDBT_P(NodeReference_t))node_id);
     for(_BDBT_P(_neit_t) i = 0; i < _BDBT_ElementPerNode; i++){
       Node->n[i] = BNR[i];
       #if BDBT_set_MultiThread
@@ -133,14 +133,14 @@ BDBT_StructBegin(_BDBT_P(t))
       #endif
     }
 
-    return node_id;
+    return (_BDBT_P(NodeReference_t))node_id;
   }
 
   #if BDBT_set_Recycle
     _BDBT_fdec(__forceinline void, Recycle,
       _BDBT_P(NodeReference_t) node_id
     ){
-      _BDBT_P(_NodeList_Recycle)(&_BDBT_this->NodeList, node_id);
+      _BDBT_P(_NodeList_Recycle)(&_BDBT_this->NodeList, (_BDBT_WrappedID_t)node_id);
     }
   #endif
 

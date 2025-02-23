@@ -26,6 +26,12 @@
   #error ?
 #endif
 
+#if BDBT_set_PointerNodeID
+  #define _BDBT_WrappedID_t _BDBT_P(Node_t) *
+#else
+  #define _BDBT_WrappedID_t _BDBT_P(NodeReference_t)
+#endif
+
 #if BDBT_set_declare_rest == 1
   #include "rest.h"
 #endif
@@ -38,6 +44,8 @@
     #undef _BDBT_KeySize
   #endif
 #endif
+
+#undef _BDBT_WrappedID_t
 
 /* ip == identifier prefix */
 /* bip == base identifier prefix */

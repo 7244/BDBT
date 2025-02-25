@@ -40,6 +40,7 @@ typedef BDBT_set_type_node _BDBT_P(NodeReference_t);
   #define bcontainer_set_NodeType BDBT_set_type_node
 #endif
 #define bcontainer_set_NodeData _BDBT_P(Node_t)
+#define bcontainer_set_Clear BDBT_set_Clear
 #define bcontainer_set_Recycle BDBT_set_Recycle
 #define bcontainer_set_MultiThread BDBT_set_MultiThread
 #define bcontainer_set_CountLockFail BDBT_set_CountLockFail
@@ -165,10 +166,12 @@ BDBT_StructBegin(_BDBT_P(t))
   ){
     _BDBT_P(_NodeList_Close)(&_BDBT_this->NodeList);
   }
-  _BDBT_fdec(void, Clear
-  ){
-    _BDBT_P(_NodeList_Clear)(&_BDBT_this->NodeList);
-  }
+  #if BDBT_set_Clear
+    _BDBT_fdec(void, Clear
+    ){
+      _BDBT_P(_NodeList_Clear)(&_BDBT_this->NodeList);
+    }
+  #endif
 
   #ifdef BDBT_set_CPP_ConstructDestruct
     _BDBT_P(t)(){

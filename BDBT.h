@@ -63,6 +63,9 @@
 #ifndef BDBT_set_BitPerNode
   #define BDBT_set_BitPerNode 2
 #endif
+#ifndef BDBT_set_Clear
+  #define BDBT_set_Clear 0
+#endif
 #ifndef BDBT_set_MultiThread
   #define BDBT_set_MultiThread 0
 #endif
@@ -100,6 +103,7 @@
 #endif
 #undef BDBT_set_CountLockFail
 #undef BDBT_set_MultiThread
+#undef BDBT_set_Clear
 #undef BDBT_set_BitPerNode
 #ifdef BDBT_set_CPP_ConstructDestruct
   #undef BDBT_set_CPP_ConstructDestruct

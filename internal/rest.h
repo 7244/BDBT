@@ -42,6 +42,7 @@ typedef BDBT_set_type_node _BDBT_P(NodeReference_t);
 #define bcontainer_set_NodeData _BDBT_P(Node_t)
 #define bcontainer_set_Clear BDBT_set_Clear
 #define bcontainer_set_Recycle BDBT_set_Recycle
+#define bcontainer_set_UseZeroAsInvalid BDBT_set_UseZeroAsInvalid
 #define bcontainer_set_MultiThread BDBT_set_MultiThread
 #define bcontainer_set_CountLockFail BDBT_set_CountLockFail
 #ifdef BDBT_set_CountLockFailGlobal

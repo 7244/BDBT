@@ -41,5 +41,19 @@ while(*KeyIndex != _BDBT_KeySize){
   }
 }
 
-while(_BDBT_BP(_FastLock_Lock)(&node->locks[k])){ /* TOOD cpu relax */ }
-return &node->locks[k];
+#if _BDBT_QueryAndLock_IfInvalid
+  if(_BDBT_bfcall(inric, __atomic_load_n(*cnr, __ATOMIC_SEQ_CST))){
+    while(_BDBT_BP(_FastLock_Lock)(&node->locks[k])){ /* TOOD cpu relax */ }
+    if(!_BDBT_bfcall(inric, **cnr)){
+      _BDBT_BP(_FastLock_Unlock)(&node->locks[k]);
+      return NULL;
+    }
+    return &node->locks[k];
+  }
+  return NULL;
+#else
+  while(_BDBT_BP(_FastLock_Lock)(&node->locks[k])){ /* TOOD cpu relax */ }
+  return &node->locks[k];
+#endif
+
+#undef _BDBT_QueryAndLock_IfInvalid

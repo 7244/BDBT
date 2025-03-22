@@ -69,6 +69,21 @@ static void _BDBT_P(QueryNoPointer)(
     _BDBT_P(KeySize_t) *KeyIndex,
     _BDBT_BP(NodeReference_t) **cnr
   ){
+    #define _BDBT_QueryAndLock_IfInvalid 0
+    #include "QueryAndLock.h"
+  }
+
+  static _BDBT_P(QueryLock_t) *_BDBT_P(QueryAndLockInvalid)(
+    _BDBT_BP(t) *tree,
+    bool BitOrderMatters,
+    #if !defined(BDBT_set_KeySize)
+      _BDBT_P(KeySize_t) _BDBT_KeySize,
+    #endif
+    const void *Key,
+    _BDBT_P(KeySize_t) *KeyIndex,
+    _BDBT_BP(NodeReference_t) **cnr
+  ){
+    #define _BDBT_QueryAndLock_IfInvalid 1
     #include "QueryAndLock.h"
   }
 

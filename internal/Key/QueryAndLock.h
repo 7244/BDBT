@@ -1,3 +1,10 @@
+#ifndef _BDBT_QueryAndLock_IfNotOutput
+  #define _BDBT_QueryAndLock_IfNotOutput 0
+#endif
+#ifndef _BDBT_QueryAndLock_IfInvalid
+  #define _BDBT_QueryAndLock_IfInvalid 0
+#endif
+
 uint8_t *kp8;
 if(BitOrderMatters == true && ENDIAN == 1){
   kp8 = &((uint8_t *)Key)[_BDBT_KeySize / 8 - 1];
@@ -41,19 +48,24 @@ while(*KeyIndex != _BDBT_KeySize){
   }
 }
 
-#if _BDBT_QueryAndLock_IfInvalid
-  if(_BDBT_bfcall(inric, __atomic_load_n(*cnr, __ATOMIC_SEQ_CST))){
-    while(_BDBT_BP(_FastLock_Lock)(&node->locks[k])){ /* TOOD cpu relax */ }
-    if(!_BDBT_bfcall(inric, **cnr)){
-      _BDBT_BP(_FastLock_Unlock)(&node->locks[k]);
-      return NULL;
-    }
-    return &node->locks[k];
-  }
+#if _BDBT_QueryAndLock_IfNotOutput
   return NULL;
 #else
-  while(_BDBT_BP(_FastLock_Lock)(&node->locks[k])){ /* TOOD cpu relax */ }
-  return &node->locks[k];
+  #if _BDBT_QueryAndLock_IfInvalid
+    if(_BDBT_bfcall(inric, __atomic_load_n(*cnr, __ATOMIC_SEQ_CST))){
+      while(_BDBT_BP(_FastLock_Lock)(&node->locks[k])){ /* TOOD cpu relax */ }
+      if(!_BDBT_bfcall(inric, **cnr)){
+        _BDBT_BP(_FastLock_Unlock)(&node->locks[k]);
+        return NULL;
+      }
+      return &node->locks[k];
+    }
+    return NULL;
+  #else
+    while(_BDBT_BP(_FastLock_Lock)(&node->locks[k])){ /* TOOD cpu relax */ }
+    return &node->locks[k];
+  #endif
 #endif
 
+#undef _BDBT_QueryAndLock_IfNotOutput
 #undef _BDBT_QueryAndLock_IfInvalid
